@@ -14,6 +14,10 @@ short messageType;
 
 typedef struct wrapheader_t {
 wrapheadervar_t wrapheadervar;
+char *apiReqId;
+char *awsReqId;
+char *funcName;
+char *tags;
 }wrapheader_t;
 
 typedef struct msgHdr_t
