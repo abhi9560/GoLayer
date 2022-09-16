@@ -152,7 +152,6 @@ extern transactionEncodeHttp_t transactionEncodeHttp;
 msgHdr_t msgHdr;
 transactionStartVar_t transactionStartVar;
 transactionStart_t transactionStart;
-transactionReset_t transactionReset;
 MethodEntryVar_t MethodEntryVar;
 MethodEntry_t MethodEntry;
 MethodExitVar_t MethodExitVar;
