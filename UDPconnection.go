@@ -261,7 +261,7 @@ func Header(buf []byte,ctx context.Context) C.int {
     var funcNameLen = C.int(len(funcName))
     var tagslength = C.int(len(tags))
     var agentType = C.short(4)
-    var messageType = C.short(4)
+    var messageType = C.short(0)
 
     len := C.WrapHeader((*C.char)(unsafe.Pointer(&buf[0])), apiReqLen, awsReqLen, funcNameLen, tagslength, agentType, messageType)
     
