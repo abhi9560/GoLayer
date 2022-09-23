@@ -529,7 +529,7 @@ func end_business_transaction(ctx context.Context,statuscode int) {
 
 func SendReqRespHeder(ctx context.Context,buffer string,Headertype string,statuscode int) {
     var buf = make([]byte,0, 1024)
-    lenght := Header(buf, ctx)
+    lenght := Header(buf, 0,ctx)
     
     var statusCode = C.int(statuscode)
     var buffer_len = C.int(len(buffer))
