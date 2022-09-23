@@ -318,12 +318,35 @@ func UDPConnection() {
 
 }
 
-/*func ReceiveMessageFromServer() {
+func ReceiveMessageFromServer(flag int) string {
     request := make([]byte, 1024)
-    a, err := aiRecObj.conn.Read(request)
+    _, err := aiRecObj.conn.Read(request)
     //a :=len(request)
-    fmt.Println("request=", string(request), a)
-}*/
+    if flag == 0 {
+        req := string(request)
+        fmt.Println("request=", req, err)
+        a := strings.Split(req, ":")
+        fmt.Println("NVCookie", a[1])
+        return a[1]
+    } else if flag == 1 {
+        var ndmsg NDMsg
+        var b []byte
+        for i := 0; i < len(request); i++ {
+            if request[i] != 0 {
+                b = append(b, request[i])
+            }
+        }
+
+        json.Unmarshal(b, &ndmsg)
+        // req, _ := json.Marshal(request)
+        fmt.Println("request=", ndmsg, string(b))
+        return ndmsg.CookieName
+    } else {
+        fmt.Println(string(request))
+        return string(request)
+    }
+}
+
 
 /*func generate_bt() {
     id := uuid.New().String()
@@ -332,15 +355,15 @@ func UDPConnection() {
     return i.String()
 }*/
 
-func StartTransactionMessage(ctx context.Context,bt_name string, CorrelationHeader string) {
+func StartTransactionMessage(ctx context.Context,bt_name string, CorrelationHeader string,ndValue string,nvValue string) {
 
     var buf = make([]byte, 1024)
     lenght := Header(buf, ctx)
     var fp_header1 = "dummy_fp_header"
     var url1 = bt_name
     btHeaderValue1 := "dummy_btHeaderValue"
-    ndCookieSet1 := ""
-    nvCookieSet1 := ""
+    ndCookieSet1 := ndValue
+    nvCookieSet1 := nvValue
 
     var fp_header = C.int(len(fp_header1))
     var url = C.int(len(url1))
@@ -524,5 +547,43 @@ func SendReqRespHeder(ctx context.Context,buffer string,Headertype string,status
         log.Fatal(err)
 
      }
+}
+func NVCookieMessage(ctx context.Context) string {
+    var buf = make([]byte, 1024)
+    _ = Header(buf, 4, ctx)
+    _, err := aiRecObj.conn.Write(buf)
+    fmt.Println("NVCookieMessage send")
+    if err != nil {
+        log.Fatal(err)
+
+    }
+    nvValue := ReceiveMessageFromServer(0)
+    return nvValue
+
+}
+func NDCookieMessage(ctx context.Context) string {
+    var buf = make([]byte, 1024)
+    _ = Header(buf, 5, ctx)
+    _, err := aiRecObj.conn.Write(buf)
+    fmt.Println("NDCookieMessage send")
+    if err != nil {
+        log.Fatal(err)
+
+    }
+    ndValue := ReceiveMessageFromServer(1)
+    return ndValue
+}
+
+func NDNFCookieMessage(ctx context.Context) {
+    var buf = make([]byte, 1024)
+    _ = Header(buf, 6, ctx)
+    _, err := aiRecObj.conn.Write(buf)
+    fmt.Println("NDNFCookieMessage send")
+    if err != nil {
+        log.Fatal(err)
+
+    }
+    _ = ReceiveMessageFromServer(2)
+
 }
 
