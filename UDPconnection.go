@@ -215,12 +215,14 @@ import (
     "unsafe"
     "os"
     "context"
+    "strings"
+    "encoding/json"
     
 )
 
 
 
-func Header(buf []byte,ctx context.Context) C.int {
+func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
 
     var funcName string
     var awsReqId string
@@ -262,7 +264,9 @@ func Header(buf []byte,ctx context.Context) C.int {
     var tagslength = C.int(len(tags))
     var agentType = C.short(4)
     var messageType = C.short(0)
-
+    if msgType != 0 {
+        messageType = msgType
+    }
     len := C.WrapHeader((*C.char)(unsafe.Pointer(&buf[0])), apiReqLen, awsReqLen, funcNameLen, tagslength, agentType, messageType)
     
     a := C.CString(apiReqId)
@@ -286,7 +290,12 @@ func Header(buf []byte,ctx context.Context) C.int {
 type aiRecord struct {
     conn net.Conn
 }
-
+type NDMsg struct {
+    CookieName       string
+    DomainName       string
+    headerInResponse string
+    mpos             string
+}
 var aiRecObj *aiRecord = nil
 var err error
 
@@ -358,7 +367,7 @@ func ReceiveMessageFromServer(flag int) string {
 func StartTransactionMessage(ctx context.Context,bt_name string, CorrelationHeader string,ndValue string,nvValue string) {
 
     var buf = make([]byte, 1024)
-    lenght := Header(buf, ctx)
+    lenght := Header(buf, 0,ctx)
     var fp_header1 = "dummy_fp_header"
     var url1 = bt_name
     btHeaderValue1 := "dummy_btHeaderValue"
@@ -412,7 +421,7 @@ func StartTransactionMessage(ctx context.Context,bt_name string, CorrelationHead
 
 func method_entry(ctx context.Context,MethodName string) {
     var buf = make([]byte, 1024)
-    lenght := Header(buf, ctx)
+    lenght := Header(buf,0, ctx)
 
     
     query_string1 := "select * from countries"
@@ -453,7 +462,7 @@ func method_entry(ctx context.Context,MethodName string) {
 func method_exit(ctx context.Context,MethodName string,statuscode int) {
 
     var buf = make([]byte, 1024)
-    lenght := Header(buf, ctx)
+    lenght := Header(buf,0, ctx)
 
     
     backend_header1 := "NA|10.20.0.85|NA|NA|mydb|mysql|NA|NA|NA|root"
@@ -499,7 +508,7 @@ func method_exit(ctx context.Context,MethodName string,statuscode int) {
 func end_business_transaction(ctx context.Context,statuscode int) {
 
     var buf = make([]byte, 1024)
-    lenght := Header(buf, ctx)
+    lenght := Header(buf,0, ctx)
 
     var statusCode = C.int(statuscode)
     var endTime = C.longlong(0)
@@ -519,7 +528,7 @@ func end_business_transaction(ctx context.Context,statuscode int) {
 
 
 func SendReqRespHeder(ctx context.Context,buffer string,Headertype string,statuscode int) {
-    var buf = make([]byte, 1024)
+    var buf = make([]byte,0, 1024)
     lenght := Header(buf, ctx)
     
     var statusCode = C.int(statuscode)
