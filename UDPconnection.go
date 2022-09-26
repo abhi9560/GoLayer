@@ -232,6 +232,7 @@ func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
         funcName = "main_test1"
     }
     var apiReqId = Apireqid
+    log.Println("apiReqId----",apiReqId)
     lc, _ := lambdacontext.FromContext(ctx)
     if lc.AwsRequestID != "" {
         awsReqId = lc.AwsRequestID
@@ -331,13 +332,13 @@ func ReceiveMessageFromServer(flag int) string {
     request := make([]byte, 1024)
     time.Sleep(1)
     _, err := aiRecObj.conn.Read(request)
-    log.Println("request not come",len(request),request)
+    
     if flag == 0 {
         req := string(request)
-        //fmt.Println("request=", req, err)
-        //a := strings.Split(req, ":")
-        log.Println("NVCookie",req ,err)
-        return req
+        fmt.Println("request=", req, err)
+        a := strings.Split(req, ":")
+        fmt.Println("NVCookie", a[1])
+        return a[1]
     } else if flag == 1 {
         var ndmsg NDMsg
         var b []byte
