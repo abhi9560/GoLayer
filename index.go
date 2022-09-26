@@ -33,8 +33,8 @@ func WrapHandler(handler interface{}) interface{} {
 		
 		UDPConnection()
 		url_path := lambdacontext.FunctionName
-		nvValue := ""//NVCookieMessage(ctx)
-   		ndValue := ""//NDCookieMessage(ctx)
+		nvValue := NVCookieMessage(ctx)
+   		ndValue := NDCookieMessage(ctx)
 		StartTransactionMessage(ctx ,url_path, "",ndValue,nvValue)
 		handlerType := reflect.TypeOf(handler)
 		if handlerType.NumIn() == 0 {
@@ -45,7 +45,8 @@ func WrapHandler(handler interface{}) interface{} {
 		
 		
 		var methodName string
-		reqHeader := "" 
+		reqHeader := ""
+		apireqid  := ""
 		Sqs  	:= reflect.TypeOf(events.SQSEvent{})
 		Sns  	:= reflect.TypeOf(events.SNSEvent{}) 
 		S3  	:= reflect.TypeOf(events.S3Event{})
@@ -67,7 +68,7 @@ func WrapHandler(handler interface{}) interface{} {
 			case ApiReq :
 				
 				methodName = "index.ApiEndpointHandler"
-				reqHeader  = ApiGatewayCall(msg,reqHeader)
+				reqHeader,apireqid = ApiGatewayCall(msg,reqHeader)
 			
 			default:
 				methodName = runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name()
@@ -77,7 +78,7 @@ func WrapHandler(handler interface{}) interface{} {
 		statuscode := 200
 		method_entry(ctx,methodName)
 		if reqHeader != ""{
-			SendReqRespHeder(ctx ,reqHeader , "req" ,statuscode)
+			//SendReqRespHeder(ctx ,reqHeader , "req" ,statuscode)
 		}
 		CurrentContext = ctx
 		//NDNFCookieMessage(ctx)
@@ -159,7 +160,7 @@ func callHandler(ctx context.Context,msg json.RawMessage, handler interface{},me
 				respHeader,statuscode := ApiResponseCall(str,respHeader)
 				
 				log.Println("all header value 2",statuscode)
-        			SendReqRespHeder(ctx ,respHeader , "resp" ,statuscode)
+        			//SendReqRespHeder(ctx ,respHeader , "resp" ,statuscode)
 		}
 		
 	}
