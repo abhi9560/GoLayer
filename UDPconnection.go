@@ -56,7 +56,7 @@ int StartTransaction(char *s,int fp_header,int url,int btHeaderValue,int ndCooki
 
     msgHdr.header_len = sizeof(msgHdr_t);
     msgHdr.total_len = sizeof (transactionStartVar_t) + msgHdr.header_len + node.transactionStartVar.fp_header +
-    node.transactionStartVar.ndCookieSet + node.transactionStartVar.nvCookieSet +
+    node.transactionStartVar.ndCookieSet + node.transactionStartVar.nrequestvCookieSet +
     node.transactionStartVar.correlationHeader +
     node.transactionStartVar.btHeaderValue +
     node.transactionStartVar.url + 3;
@@ -76,7 +76,7 @@ int StartTransaction(char *s,int fp_header,int url,int btHeaderValue,int ndCooki
 
 int MethodEntryFunction(char *s,int urlParameter,int methodName,int query_string,int mid,long long flowpathinstance,long threadId,long long startTime,int len)
 {
-    msgHdr_t msgHdr;
+    msgHdr_t msgHdr;request
     MethodEntry_t node;
     memcpy(s+len, "^",1);
     len += 1;
@@ -214,13 +214,13 @@ import (
     "github.com/aws/aws-lambda-go/lambdacontext"
     "unsafe"
     "os"
-    "context"
-    "strings"
+    "context"request
+   // "strings"
     "encoding/json"
     
 )
 
-
+request
 
 func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
 
@@ -335,9 +335,9 @@ func ReceiveMessageFromServer(flag int) string {
     if flag == 0 {
         req := string(request)
         //fmt.Println("request=", req, err)
-        a := strings.Split(req, ":")
-        log.Println("NVCookie", a[1],err)
-        return a[1]
+        //a := strings.Split(req, ":")
+        log.Println("NVCookie",req ,err)
+        return req
     } else if flag == 1 {
         var ndmsg NDMsg
         var b []byte
