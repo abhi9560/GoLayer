@@ -220,7 +220,6 @@ import (
     
 )
 
-request
 
 func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
 
