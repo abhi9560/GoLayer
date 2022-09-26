@@ -294,8 +294,8 @@ type aiRecord struct {
 type NDMsg struct {
     CookieName       string
     DomainName       string
-    headerInResponse string
-    mpos             string
+    HeaderInResponse string
+    Mpos             string
 }
 var aiRecObj *aiRecord = nil
 var err error
@@ -564,7 +564,7 @@ func NVCookieMessage(ctx context.Context) string {
     _, err := aiRecObj.conn.Write(buf)
     fmt.Println("NVCookieMessage send")
     if err != nil {
-        log.Fatal(err)
+        log.Println("data not send",err)
 
     }
     nvValue := ReceiveMessageFromServer(0)
