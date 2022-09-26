@@ -51,15 +51,16 @@ func S3EventCall(msg json.RawMessage){
 					        
   				}
 }
-func ApiGatewayCall(msg json.RawMessage,reqHeader string) string {
+func ApiGatewayCall(msg json.RawMessage,reqHeader string)( string,string) {
          request := events.APIGatewayProxyRequest{}
 				 
          err  = json.Unmarshal(msg,&request)
-				 if err != nil {
-					   log.Println("error in ApiGateway.json file",err)
-				 }
+	 if err != nil {
+		log.Println("error in ApiGateway.json file",err)
+	 }
+	 apireqid := request.RequestContext.RequestID
 				
-  return MakeHeader(reqHeader,request.Headers)
+  return MakeHeader(reqHeader,request.Headers),apireqid
 								 
 }  
 
