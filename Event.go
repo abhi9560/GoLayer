@@ -58,9 +58,9 @@ func ApiGatewayCall(msg json.RawMessage,reqHeader string)( string,string) {
 	 if err != nil {
 		log.Println("error in ApiGateway.json file",err)
 	 }
-	 apireqid := request.RequestContext.RequestID
+	 Apireqid := request.RequestContext.RequestID
 				
-  return MakeHeader(reqHeader,request.Headers),apireqid
+  return MakeHeader(reqHeader,request.Headers),Apireqid
 								 
 }  
 
