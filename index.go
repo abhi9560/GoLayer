@@ -20,7 +20,7 @@ var (
 	CurrentContext context.Context
 )
 
-
+var Apireqid  = ""
 func WrapHandler(handler interface{}) interface{} {
 
 	
@@ -46,7 +46,7 @@ func WrapHandler(handler interface{}) interface{} {
 		
 		var methodName string
 		reqHeader := ""
-		apireqid  := ""
+		
 		Sqs  	:= reflect.TypeOf(events.SQSEvent{})
 		Sns  	:= reflect.TypeOf(events.SNSEvent{}) 
 		S3  	:= reflect.TypeOf(events.S3Event{})
@@ -68,8 +68,8 @@ func WrapHandler(handler interface{}) interface{} {
 			case ApiReq :
 				
 				methodName = "index.ApiEndpointHandler"
-				reqHeader,apireqid = ApiGatewayCall(msg,reqHeader)
-				log.Println("apireqid",apireqid)
+				reqHeader,Apireqid = ApiGatewayCall(msg,reqHeader)
+				log.Println("apireqid",Apireqid)
 			
 			default:
 				methodName = runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name()
