@@ -266,6 +266,7 @@ func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
     var messageType = C.short(0)
     if msgType != 0 {
         messageType = msgType
+        log.Println("massage type = ",msgType)
     }
     len := C.WrapHeader((*C.char)(unsafe.Pointer(&buf[0])), apiReqLen, awsReqLen, funcNameLen, tagslength, agentType, messageType)
     
@@ -333,9 +334,9 @@ func ReceiveMessageFromServer(flag int) string {
     //a :=len(request)
     if flag == 0 {
         req := string(request)
-        fmt.Println("request=", req, err)
+        //fmt.Println("request=", req, err)
         a := strings.Split(req, ":")
-        fmt.Println("NVCookie", a[1])
+        log.Println("NVCookie", a[1])
         return a[1]
     } else if flag == 1 {
         var ndmsg NDMsg
@@ -348,10 +349,10 @@ func ReceiveMessageFromServer(flag int) string {
 
         json.Unmarshal(b, &ndmsg)
         // req, _ := json.Marshal(request)
-        fmt.Println("request=", ndmsg, string(b))
+        log.Println("request=", ndmsg, string(b))
         return ndmsg.CookieName
     } else {
-        fmt.Println(string(request))
+        log.Println("ye kya h",string(request))
         return string(request)
     }
 }
