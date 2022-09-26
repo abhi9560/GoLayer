@@ -336,7 +336,7 @@ func ReceiveMessageFromServer(flag int) string {
         req := string(request)
         //fmt.Println("request=", req, err)
         a := strings.Split(req, ":")
-        log.Println("NVCookie", a[1])
+        log.Println("NVCookie", a[1],err)
         return a[1]
     } else if flag == 1 {
         var ndmsg NDMsg
