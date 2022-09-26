@@ -92,7 +92,7 @@ func WrapHandler(handler interface{}) interface{} {
 		
 		end_business_transaction(ctx,statuscode)
 		
-		CloseUDP()
+		//CloseUDP()
 		coldStart = false
 		CurrentContext = nil
 		return result, err
