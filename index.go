@@ -68,7 +68,8 @@ func WrapHandler(handler interface{}) interface{} {
 				reqHeader  = ApiGatewayCall(msg,reqHeader)
 			
 			default:
-				methodName = "custem_methodName"
+				methodName = runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name()
+				log.Println("methodname costom",methodName)
 		
 			
 		}
