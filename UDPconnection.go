@@ -330,7 +330,6 @@ func UDPConnection() {
 
 func ReceiveMessageFromServer(flag int) string {
     request := make([]byte, 1024)
-    time.Sleep(1)
     _, err := aiRecObj.conn.Read(request)
     
     if flag == 0 {
