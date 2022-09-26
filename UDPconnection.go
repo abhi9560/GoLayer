@@ -232,7 +232,7 @@ func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
     }else {
         funcName = "main_test1"
     }
-    var apiReqId = "qewihcnisfhew"
+    var apiReqId = Apireqid
     lc, _ := lambdacontext.FromContext(ctx)
     if lc.AwsRequestID != "" {
         awsReqId = lc.AwsRequestID
