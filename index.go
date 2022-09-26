@@ -34,7 +34,7 @@ func WrapHandler(handler interface{}) interface{} {
 		UDPConnection()
 		url_path := lambdacontext.FunctionName
 		nvValue := NVCookieMessage(ctx)
-   		ndValue := ""//NDCookieMessage(ctx)
+   		ndValue := NDCookieMessage(ctx)
 		StartTransactionMessage(ctx ,url_path, "",ndValue,nvValue)
 		handlerType := reflect.TypeOf(handler)
 		if handlerType.NumIn() == 0 {
@@ -79,10 +79,10 @@ func WrapHandler(handler interface{}) interface{} {
 		statuscode := 200
 		method_entry(ctx,methodName)
 		if reqHeader != ""{
-			//SendReqRespHeder(ctx ,reqHeader , "req" ,statuscode)
+			SendReqRespHeder(ctx ,reqHeader , "req" ,statuscode)
 		}
 		CurrentContext = ctx
-		//NDNFCookieMessage(ctx)
+		NDNFCookieMessage(ctx)
 		result, err := callHandler(ctx,msg, handler,messageType)
 		if err != nil {
 			statuscode = 500
