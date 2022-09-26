@@ -56,7 +56,7 @@ int StartTransaction(char *s,int fp_header,int url,int btHeaderValue,int ndCooki
 
     msgHdr.header_len = sizeof(msgHdr_t);
     msgHdr.total_len = sizeof (transactionStartVar_t) + msgHdr.header_len + node.transactionStartVar.fp_header +
-    node.transactionStartVar.ndCookieSet + node.transactionStartVar.nrequestvCookieSet +
+    node.transactionStartVar.ndCookieSet + node.transactionStartVar.nvCookieSet +
     node.transactionStartVar.correlationHeader +
     node.transactionStartVar.btHeaderValue +
     node.transactionStartVar.url + 3;
@@ -76,7 +76,7 @@ int StartTransaction(char *s,int fp_header,int url,int btHeaderValue,int ndCooki
 
 int MethodEntryFunction(char *s,int urlParameter,int methodName,int query_string,int mid,long long flowpathinstance,long threadId,long long startTime,int len)
 {
-    msgHdr_t msgHdr;request
+    msgHdr_t msgHdr;
     MethodEntry_t node;
     memcpy(s+len, "^",1);
     len += 1;
