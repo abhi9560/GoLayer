@@ -46,7 +46,7 @@ func WrapHandler(handler interface{}) interface{} {
 		
 		var methodName string
 		reqHeader := ""
-		//apireqid  := ""
+		apireqid  := ""
 		Sqs  	:= reflect.TypeOf(events.SQSEvent{})
 		Sns  	:= reflect.TypeOf(events.SNSEvent{}) 
 		S3  	:= reflect.TypeOf(events.S3Event{})
