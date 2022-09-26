@@ -232,13 +232,13 @@ func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
     }else {
         funcName = "main_test1"
     }
-    var apiReqId = "akkdnfjnflffk"
+    var apiReqId = "qewihcnisfhew"
     lc, _ := lambdacontext.FromContext(ctx)
     if lc.AwsRequestID != "" {
         awsReqId = lc.AwsRequestID
         log.Printf("REQUEST ID: %s", lc.AwsRequestID)
     }else {
-         awsReqId =  "asfddhgfjhgj"
+         awsReqId =  "wrong awsReqID"
     }
     var Tier,server,appName string
     if os.Getenv("CAV_APP_AGENT_TIER") == "" {
