@@ -329,8 +329,9 @@ func UDPConnection() {
 
 func ReceiveMessageFromServer(flag int) string {
     request := make([]byte, 1024)
+    time.Sleep(1)
     _, err := aiRecObj.conn.Read(request)
-    //a :=len(request)
+    log.Println("request not come",len(request),request)
     if flag == 0 {
         req := string(request)
         //fmt.Println("request=", req, err)
