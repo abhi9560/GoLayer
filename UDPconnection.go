@@ -231,7 +231,7 @@ func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
     }else {
         funcName = "main_test1"
     }
-    
+    apiReqId := "c6af9ac6-7b61-11e6-9a41-93e8deadbeef"
     lc, _ := lambdacontext.FromContext(ctx)
     if lc.AwsRequestID != "" {
         awsReqId = lc.AwsRequestID
