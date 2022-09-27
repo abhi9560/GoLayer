@@ -20,7 +20,6 @@ var (
 	CurrentContext context.Context
 )
 
-var Apireqid  = ""
 func WrapHandler(handler interface{}) interface{} {
 
 	
@@ -34,7 +33,7 @@ func WrapHandler(handler interface{}) interface{} {
 		UDPConnection()
 		url_path := lambdacontext.FunctionName
 		nvValue := NVCookieMessage(ctx)
-   		ndValue := NDCookieMessage(ctx)
+   		//ndValue := NDCookieMessage(ctx)
 		StartTransactionMessage(ctx ,url_path, "",ndValue,nvValue)
 		handlerType := reflect.TypeOf(handler)
 		if handlerType.NumIn() == 0 {
@@ -45,7 +44,8 @@ func WrapHandler(handler interface{}) interface{} {
 		
 		
 		var methodName string
-		reqHeader := ""
+		var eventvalue  interface{}
+		var Headers string
 		
 		Sqs  	:= reflect.TypeOf(events.SQSEvent{})
 		Sns  	:= reflect.TypeOf(events.SNSEvent{}) 
@@ -68,8 +68,8 @@ func WrapHandler(handler interface{}) interface{} {
 			case ApiReq :
 				
 				methodName = "index.ApiEndpointHandler"
-				reqHeader,Apireqid = ApiGatewayCall(msg,reqHeader)
-				log.Println("apireqid",Apireqid)
+				Headers,eventvalue = ApiGatewayCall(msg)
+				log.Println("value in interface",eventvalue.requestContext.requestId)
 			
 			default:
 				methodName = runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name()
@@ -78,11 +78,11 @@ func WrapHandler(handler interface{}) interface{} {
 		}
 		statuscode := 200
 		method_entry(ctx,methodName)
-		if reqHeader != ""{
-			SendReqRespHeder(ctx ,reqHeader , "req" ,statuscode)
+		if Headers != ""{
+			SendReqRespHeder(ctx ,Headers , "req" ,statuscode)
 		}
 		CurrentContext = ctx
-		NDNFCookieMessage(ctx)
+		//NDNFCookieMessage(ctx)
 		result, err := callHandler(ctx,msg, handler,messageType)
 		if err != nil {
 			statuscode = 500
@@ -128,9 +128,9 @@ func callHandler(ctx context.Context,msg json.RawMessage, handler interface{},me
 
 	handlerValue := reflect.ValueOf(handler)
 	
-	log.Println("handlerValue   ",handlerValue)
+	
 	output := handlerValue.Call(args)
-	log.Println("full output",output)
+	
 	var response interface{}
 	
 	var errResponse error
@@ -138,7 +138,7 @@ func callHandler(ctx context.Context,msg json.RawMessage, handler interface{},me
 	if len(output) > 0 {
 		// If there are any output values, the last should always be an error
 		val := output[len(output)-1].Interface()
-		log.Println("val of output",val)
+		
 		if errVal, ok := val.(error); ok {
 			errResponse = errVal
 		}
@@ -160,8 +160,8 @@ func callHandler(ctx context.Context,msg json.RawMessage, handler interface{},me
 				}
 				respHeader,statuscode := ApiResponseCall(str,respHeader)
 				
-				log.Println("all header value 2",statuscode)
-        			//SendReqRespHeder(ctx ,respHeader , "resp" ,statuscode)
+				
+        			SendReqRespHeder(ctx ,respHeader , "resp" ,statuscode)
 		}
 		
 	}
