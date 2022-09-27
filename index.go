@@ -33,7 +33,7 @@ func WrapHandler(handler interface{}) interface{} {
 		UDPConnection()
 		url_path := lambdacontext.FunctionName
 		nvValue := NVCookieMessage(ctx)
-   		//ndValue := NDCookieMessage(ctx)
+   		ndValue := ""//NDCookieMessage(ctx)
 		StartTransactionMessage(ctx ,url_path, "",ndValue,nvValue)
 		handlerType := reflect.TypeOf(handler)
 		if handlerType.NumIn() == 0 {
@@ -44,7 +44,7 @@ func WrapHandler(handler interface{}) interface{} {
 		
 		
 		var methodName string
-		var eventvalue  interface{}
+		var eventvalue events.APIGatewayProxyRequest
 		var Headers string
 		
 		Sqs  	:= reflect.TypeOf(events.SQSEvent{})
