@@ -69,7 +69,7 @@ func WrapHandler(handler interface{}) interface{} {
 				
 				methodName = "index.ApiEndpointHandler"
 				Headers,eventvalue = ApiGatewayCall(msg)
-				log.Println("value in interface",eventvalue.requestContext.requestId)
+				log.Println("value in interface",eventvalue.RequestContext.RequestId)
 			
 			default:
 				methodName = runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name()
