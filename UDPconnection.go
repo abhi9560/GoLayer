@@ -231,8 +231,7 @@ func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
     }else {
         funcName = "main_test1"
     }
-    var apiReqId = Apireqid
-    log.Println("apiReqId----",apiReqId)
+    
     lc, _ := lambdacontext.FromContext(ctx)
     if lc.AwsRequestID != "" {
         awsReqId = lc.AwsRequestID
@@ -290,6 +289,7 @@ func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
 
 type aiRecord struct {
     conn net.Conn
+    
 }
 type NDMsg struct {
     CookieName       string
