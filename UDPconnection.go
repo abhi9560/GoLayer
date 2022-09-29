@@ -378,8 +378,7 @@ func StartTransactionMessage(ctx context.Context,bt_name string, CorrelationHead
 
     fmt.Println("send data_start")
     if err != nil {
-        log.Fatal(err)
-        fmt.Println("err not null")
+        log.Println("not able to send data")
 
     }
 
@@ -421,7 +420,7 @@ func method_entry(ctx context.Context,MethodName string) {
     _, err := aiRecObj.conn.Write(buf)
     fmt.Println("send data_MEntry")
     if err != nil {
-        log.Fatal(err)
+        log.Println(err)
 
     }
 }
@@ -467,7 +466,7 @@ func method_exit(ctx context.Context,MethodName string,statuscode int) {
     _, err := aiRecObj.conn.Write(buf)
     fmt.Println("send data_MExit")
     if err != nil {
-        log.Fatal(err)
+        log.Println(err)
 
     }
 
@@ -488,7 +487,7 @@ func end_business_transaction(ctx context.Context,statuscode int) {
     _, err := aiRecObj.conn.Write(buf)
     fmt.Println("send data_end")
     if err != nil {
-        log.Fatal(err)
+        log.Println(err)
 
     }
 
@@ -521,7 +520,7 @@ func SendReqRespHeder(ctx context.Context,buffer string,Headertype string,status
     _, err := aiRecObj.conn.Write(buf)
     fmt.Println("send headerReqResp")
     if err != nil {
-        log.Fatal(err)
+        log.Println(err)
 
      }
 }
