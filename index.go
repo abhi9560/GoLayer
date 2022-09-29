@@ -85,6 +85,8 @@ func WrapHandler(handler interface{}) interface{} {
 		//NDNFCookieMessage(ctx)
 		result, err := callHandler(ctx,msg, handler,messageType)
 		if err != nil {
+			println("Not able to get client data")
+			err="Not able to get client data"
 			statuscode = 500
 		}
 	
@@ -156,7 +158,8 @@ func callHandler(ctx context.Context,msg json.RawMessage, handler interface{},me
 				respHeader := ""
 				str, err := json.Marshal(response)
 				if err != nil {
-					log.Println("unable to marshal json", err)
+					err="Unable to decode client data"
+					log.Println("unable to decode client data")
 				}
 				respHeader,statuscode := ApiResponseCall(str,respHeader)
 				
