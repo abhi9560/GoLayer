@@ -296,7 +296,7 @@ func NewAIRecord() *aiRecord {
     port      := os.Getenv("CAV_APP_AGENT_PROXYPORT")
     r.conn, err = net.Dial("udp", ipAddeers+":"+port)
     if err != nil {
-        fmt.Printf("Some error %v", err)
+        fmt.Printf("Not able to make connection with CAV_APP_AGENT %v", err)
     }
     fmt.Println("conn value", r.conn)
     return &r
