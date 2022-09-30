@@ -158,8 +158,8 @@ func callHandler(ctx context.Context,msg json.RawMessage, handler interface{},me
 				respHeader := ""
 				str, err := json.Marshal(response)
 				if err != nil {
-					err="Unable to decode client data"
-					log.Println("unable to decode client data")
+					//err="Unable to decode client data"
+					log.Println("unable to decode client data",err)
 				}
 				respHeader,statuscode := ApiResponseCall(str,respHeader)
 				
