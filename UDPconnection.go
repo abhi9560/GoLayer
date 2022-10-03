@@ -507,7 +507,7 @@ func SendReqRespHeder(ctx context.Context,buffer string,Headertype string,status
 
      }
 }
-func NDCookieMessage(ctx context.Context) string  {
+func NDCookieMessage(ctx context.Context)   {
     var buf = make([]byte, 1024)
     _ = Header(buf, 5, ctx)
     _, err := aiRecObj.conn.Write(buf)
@@ -516,7 +516,7 @@ func NDCookieMessage(ctx context.Context) string  {
 
     }
     ReceiveMessageFromServer()
-    ndValue := "abhi"
+   // ndValue := "abhi"
     fmt.Println("NDCookieMessage recived")
-    return ndValue
+    //return ndValue
 }
