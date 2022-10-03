@@ -33,8 +33,8 @@ func WrapHandler(handler interface{}) interface{} {
 		
 		UDPConnection()
 		url_path := lambdacontext.FunctionName
-	        NVCookieMessage(ctx)
-   		//NDCookieMessage(ctx)
+	        //NVCookieMessage(ctx)
+   		NDCookieMessage(ctx)
 		StartTransactionMessage(ctx ,url_path, "")
 		handlerType := reflect.TypeOf(handler)
 		if handlerType.NumIn() == 0 {
