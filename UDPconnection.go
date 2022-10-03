@@ -296,9 +296,9 @@ func NewAIRecord() *aiRecord {
     port      := os.Getenv("CAV_APP_AGENT_PROXYPORT")
     r.conn, err = net.Dial("udp", ipAddeers+":"+port)
     if err != nil {
-        fmt.Printf("Not able to make connection with CAV_APP_AGENT %v", err)
+        log.Printf("Not able to make connection with CAV_APP_AGENT %v", err)
     }
-    fmt.Println("conn value", r.conn)
+   // fmt.Println("conn value", r.conn)
     return &r
 }
 
@@ -309,10 +309,10 @@ func CloseUDP() {
 
 func UDPConnection() {
 
-    fmt.Println("udp_call")
+    log.Println("udp_call")
 
     aiRecObj = NewAIRecord()
-    fmt.Println(aiRecObj)
+   // fmt.Println(aiRecObj)
 
     time.Sleep(1 * time.Second)
 
@@ -376,7 +376,7 @@ func StartTransactionMessage(ctx context.Context,bt_name string, CorrelationHead
     C.last((*C.char)(unsafe.Pointer(&buf[0])), lenght)
     _, err := aiRecObj.conn.Write(buf)
 
-    fmt.Println("send data_start")
+    log.Println("send data_start")
     if err != nil {
         log.Println("not able to send data")
 
@@ -418,7 +418,7 @@ func method_entry(ctx context.Context,MethodName string) {
     C.last((*C.char)(unsafe.Pointer(&buf[0])), lenght)
 
     _, err := aiRecObj.conn.Write(buf)
-    fmt.Println("send data_MEntry")
+    log.Println("send data_MEntry")
     if err != nil {
         log.Println(err)
 
@@ -464,7 +464,7 @@ func method_exit(ctx context.Context,MethodName string,statuscode int) {
 
     C.last((*C.char)(unsafe.Pointer(&buf[0])), lenght)
     _, err := aiRecObj.conn.Write(buf)
-    fmt.Println("send data_MExit")
+    log.Println("send data_MExit")
     if err != nil {
         log.Println(err)
 
@@ -485,7 +485,7 @@ func end_business_transaction(ctx context.Context,statuscode int) {
     lenght = C.EndTransaction((*C.char)(unsafe.Pointer(&buf[0])), statusCode, endTime, flowpathinstance, cpuTime, lenght)
     C.last((*C.char)(unsafe.Pointer(&buf[0])), lenght)
     _, err := aiRecObj.conn.Write(buf)
-    fmt.Println("send data_end")
+    log.Println("send data_end")
     if err != nil {
         log.Println(err)
 
@@ -518,7 +518,7 @@ func SendReqRespHeder(ctx context.Context,buffer string,Headertype string,status
 
     C.last((*C.char)(unsafe.Pointer(&buf[0])), lenght)
     _, err := aiRecObj.conn.Write(buf)
-    fmt.Println("send headerReqResp")
+    log.Println("send headerReqResp")
     if err != nil {
         log.Println(err)
 
