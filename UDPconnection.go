@@ -1,14 +1,11 @@
 package index
 
 /*
-
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include "ndlb_encode.h"
-
-
 int WrapHeader(char *s,int apiReqLen,int awsReqLen,int funcNameLen,int tagslength,short agentType,short messageType){
     int len = 0;
     wrapheader_t wrapHeader;
@@ -22,21 +19,16 @@ int WrapHeader(char *s,int apiReqLen,int awsReqLen,int funcNameLen,int tagslengt
     wrapHeader.wrapheadervar.agentType = agentType ;
     wrapHeader.wrapheadervar.messageType = messageType;
     wrapHeader.wrapheadervar.whLen = sizeof(wrapheadervar_t)+wrapHeader.wrapheadervar.awsReqLen+wrapHeader.wrapheadervar.apiReqLen+wrapHeader.wrapheadervar.funcNameLen+wrapHeader.wrapheadervar.tagslength+1;
-
     memcpy(s + len , (char *)&(wrapHeader.wrapheadervar), sizeof(wrapHeader.wrapheadervar));
     len += sizeof(wrapheadervar_t);
-
   return len;
 }
-
 int ValueStore(char *s,char *value,int len,int number)
 {
-
       memcpy(s + len, value ,number);
       len += number;
       return len;
 }
-
 int StartTransaction(char *s,int fp_header,int url,int btHeaderValue,int ndCookieSet,int nvCookieSet,int correlationHeader,long long flowpathinstance,long qTimeMS,long long startTimeFP,int len)
 {
     transactionStart_t node;
@@ -53,7 +45,6 @@ int StartTransaction(char *s,int fp_header,int url,int btHeaderValue,int ndCooki
     node.transactionStartVar.nvCookieSet = nvCookieSet ;
     node.transactionStartVar.correlationHeader = correlationHeader ;
     node.transactionStartVar.flowpathinstance = flowpathinstance;
-
     msgHdr.header_len = sizeof(msgHdr_t);
     msgHdr.total_len = sizeof (transactionStartVar_t) + msgHdr.header_len + node.transactionStartVar.fp_header +
     node.transactionStartVar.ndCookieSet + node.transactionStartVar.nvCookieSet +
@@ -61,19 +52,14 @@ int StartTransaction(char *s,int fp_header,int url,int btHeaderValue,int ndCooki
     node.transactionStartVar.btHeaderValue +
     node.transactionStartVar.url + 3;
     msgHdr.msg_type = 2;
-
     memcpy(s + len , (char *)&(msgHdr), msgHdr.header_len);
     len += sizeof(msgHdr);
-
-
     memcpy(s + len , "|",1);
     len += 1;
     memcpy(s + len, (char *)&(node.transactionStartVar), sizeof(node.transactionStartVar));
     len += sizeof(node.transactionStartVar) ;
-
     return len;
 }
-
 int MethodEntryFunction(char *s,int urlParameter,int methodName,int query_string,int mid,long long flowpathinstance,long threadId,long long startTime,int len)
 {
     msgHdr_t msgHdr;
@@ -88,30 +74,24 @@ int MethodEntryFunction(char *s,int urlParameter,int methodName,int query_string
     node.MethodEntryVar.mid = mid ;
     node.MethodEntryVar.startTime = startTime ;
     node.MethodEntryVar.flowpathinstance = flowpathinstance;
-
     msgHdr.header_len = sizeof(msgHdr_t);
     msgHdr.total_len = sizeof(MethodEntryVar_t) + msgHdr.header_len + node.MethodEntryVar.methodName +
     node.MethodEntryVar.query_string+ node.MethodEntryVar.urlParameter + 3;
     msgHdr.msg_type = 0;
     memcpy(s + len , (char *)&(msgHdr), msgHdr.header_len);
     len += sizeof(msgHdr);
-
-
     memcpy(s + len , "|",1);
     len += 1;
     memcpy(s + len, (char *)&(node.MethodEntryVar), sizeof(MethodEntryVar_t));
     len += sizeof(MethodEntryVar_t);
-
     return len;
 }
-
 int MethodExitFunction(char *s,int statusCode,int mid,int eventType,int isCallout,long duration,long threadId,long long cpuTime,long long flowpathinstance,long long tierCallOutSeqNum,long long endTime,int methodName,int backend_header,int requestNotificationPhase,int len)
 {
     MethodExit_t node;
     msgHdr_t msgHdr;
     memcpy(s+len, "^",1);
     len += 1;
-
     node.MethodExitVar.statusCode = statusCode ;
     node.MethodExitVar.mid = mid ;
     node.MethodExitVar.eventType = eventType;
@@ -124,23 +104,18 @@ int MethodExitFunction(char *s,int statusCode,int mid,int eventType,int isCallou
     node.MethodExitVar.methodName = methodName ;
     node.MethodExitVar.backend_header = backend_header;
     node.MethodExitVar.requestNotificationPhase = requestNotificationPhase ;
-
     msgHdr.header_len = sizeof(msgHdr_t);
     msgHdr.total_len = sizeof(MethodExitVar_t)+ msgHdr.header_len + node.MethodExitVar.methodName + node.MethodExitVar.backend_header +
     node.MethodExitVar.requestNotificationPhase + 3;
     msgHdr.msg_type = 1;
     memcpy(s + len , (char *)&(msgHdr), msgHdr.header_len);
     len += sizeof(msgHdr);
-
-
     memcpy(s + len , "|",1);
     len += 1;
     memcpy(s + len, (char *)&(node.MethodExitVar), sizeof(node.MethodExitVar));
     len += sizeof(MethodExitVar_t);
-
     return len;
 }
-
 int EndTransaction(char *s,int statuscode,long long endTime,long long flowpathinstance,long long cpuTime ,int len)
 {
     transactionEnd_t transactionEnd;
@@ -157,18 +132,13 @@ int EndTransaction(char *s,int statuscode,long long endTime,long long flowpathin
     msgHdr.header_len = sizeof(msgHdr_t);
     msgHdr.total_len = msgHdr.header_len + N + 3;
     msgHdr.msg_type = 3;
-
     memcpy(s + len , (char *)&(msgHdr), sizeof(msgHdr_t));
     len += sizeof(msgHdr_t);
-
-
     memcpy(s + len , "|",1);
     len += 1;
     memcpy(s + len, (void *)&transactionEnd, N);
     len += N;
-
     return len;
-
 }
 int ReqRespHeader(char *s,int statuscode,int buffer_len,int type_len,long long flowpathinstance,int len)
 {
@@ -195,7 +165,6 @@ int ReqRespHeader(char *s,int statuscode,int buffer_len,int type_len,long long f
     
      memcpy(s + len, (char *)&(node.transactionEncodeVarHttp), sizeof(node.transactionEncodeVarHttp));
     len += sizeof(transactionEncodeVarHttp_t);
-
     return len;
 }
     
@@ -215,13 +184,12 @@ import (
     "unsafe"
     "os"
     "context"
-    "strings"
-    "encoding/json"
     
 )
 
 
-func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
+
+func Header(buf []byte,ctx context.Context) C.int {
 
     var funcName string
     var awsReqId string
@@ -231,13 +199,13 @@ func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
     }else {
         funcName = "main_test1"
     }
-    apiReqId := "c6af9ac6-7b61-11e6-9a41-93e8deadbeef"
+    var apiReqId = "akkdnfjnflffk"
     lc, _ := lambdacontext.FromContext(ctx)
     if lc.AwsRequestID != "" {
         awsReqId = lc.AwsRequestID
         log.Printf("REQUEST ID: %s", lc.AwsRequestID)
     }else {
-         awsReqId =  "wrong awsReqID"
+         awsReqId =  "asfddhgfjhgj"
     }
     var Tier,server,appName string
     if os.Getenv("CAV_APP_AGENT_TIER") == "" {
@@ -263,10 +231,7 @@ func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
     var tagslength = C.int(len(tags))
     var agentType = C.short(4)
     var messageType = C.short(0)
-    if msgType != 0 {
-        messageType = msgType
-        log.Println("massage type = ",msgType)
-    }
+
     len := C.WrapHeader((*C.char)(unsafe.Pointer(&buf[0])), apiReqLen, awsReqLen, funcNameLen, tagslength, agentType, messageType)
     
     a := C.CString(apiReqId)
@@ -289,14 +254,8 @@ func Header(buf []byte,msgType C.short,ctx context.Context) C.int {
 
 type aiRecord struct {
     conn net.Conn
-    
 }
-type NDMsg struct {
-    CookieName       string
-    DomainName       string
-    HeaderInResponse string
-    Mpos             string
-}
+
 var aiRecObj *aiRecord = nil
 var err error
 
@@ -306,7 +265,7 @@ func NewAIRecord() *aiRecord {
     port      := os.Getenv("CAV_APP_AGENT_PROXYPORT")
     r.conn, err = net.Dial("udp", ipAddeers+":"+port)
     if err != nil {
-        fmt.Printf("Some error %v", err)
+        fmt.Printf("Not able to make connection with CAV_APP_AGENT %v", err)
     }
     fmt.Println("conn value", r.conn)
     return &r
@@ -328,35 +287,12 @@ func UDPConnection() {
 
 }
 
-func ReceiveMessageFromServer(flag int) string {
+/*func ReceiveMessageFromServer() {
     request := make([]byte, 1024)
-    _, err := aiRecObj.conn.Read(request)
-    
-    if flag == 0 {
-        req := string(request)
-        fmt.Println("request=", req, err)
-        a := strings.Split(req, ":")
-        fmt.Println("NVCookie", a[1])
-        return a[1]
-    } else if flag == 1 {
-        var ndmsg NDMsg
-        var b []byte
-        for i := 0; i < len(request); i++ {
-            if request[i] != 0 {
-                b = append(b, request[i])
-            }
-        }
-
-        json.Unmarshal(b, &ndmsg)
-        // req, _ := json.Marshal(request)
-        log.Println("request=", ndmsg, string(b))
-        return ndmsg.CookieName
-    } else {
-        log.Println("ye kya h",string(request))
-        return string(request)
-    }
-}
-
+    a, err := aiRecObj.conn.Read(request)
+    //a :=len(request)
+    fmt.Println("request=", string(request), a)
+}*/
 
 /*func generate_bt() {
     id := uuid.New().String()
@@ -365,15 +301,15 @@ func ReceiveMessageFromServer(flag int) string {
     return i.String()
 }*/
 
-func StartTransactionMessage(ctx context.Context,bt_name string, CorrelationHeader string,ndValue string,nvValue string) {
+func StartTransactionMessage(ctx context.Context,bt_name string, CorrelationHeader string) {
 
     var buf = make([]byte, 1024)
-    lenght := Header(buf, 0,ctx)
+    lenght := Header(buf, ctx)
     var fp_header1 = "dummy_fp_header"
     var url1 = bt_name
     btHeaderValue1 := "dummy_btHeaderValue"
-    ndCookieSet1 := ndValue
-    nvCookieSet1 := nvValue
+    ndCookieSet1 := ""
+    nvCookieSet1 := ""
 
     var fp_header = C.int(len(fp_header1))
     var url = C.int(len(url1))
@@ -411,8 +347,7 @@ func StartTransactionMessage(ctx context.Context,bt_name string, CorrelationHead
 
     fmt.Println("send data_start")
     if err != nil {
-        log.Fatal(err)
-        fmt.Println("err not null")
+        log.Println("not able to send data")
 
     }
 
@@ -422,7 +357,7 @@ func StartTransactionMessage(ctx context.Context,bt_name string, CorrelationHead
 
 func method_entry(ctx context.Context,MethodName string) {
     var buf = make([]byte, 1024)
-    lenght := Header(buf,0, ctx)
+    lenght := Header(buf, ctx)
 
     
     query_string1 := "select * from countries"
@@ -454,7 +389,7 @@ func method_entry(ctx context.Context,MethodName string) {
     _, err := aiRecObj.conn.Write(buf)
     fmt.Println("send data_MEntry")
     if err != nil {
-        log.Fatal(err)
+        log.Println(err)
 
     }
 }
@@ -463,7 +398,7 @@ func method_entry(ctx context.Context,MethodName string) {
 func method_exit(ctx context.Context,MethodName string,statuscode int) {
 
     var buf = make([]byte, 1024)
-    lenght := Header(buf,0, ctx)
+    lenght := Header(buf, ctx)
 
     
     backend_header1 := "NA|10.20.0.85|NA|NA|mydb|mysql|NA|NA|NA|root"
@@ -500,7 +435,7 @@ func method_exit(ctx context.Context,MethodName string,statuscode int) {
     _, err := aiRecObj.conn.Write(buf)
     fmt.Println("send data_MExit")
     if err != nil {
-        log.Fatal(err)
+        log.Println(err)
 
     }
 
@@ -509,7 +444,7 @@ func method_exit(ctx context.Context,MethodName string,statuscode int) {
 func end_business_transaction(ctx context.Context,statuscode int) {
 
     var buf = make([]byte, 1024)
-    lenght := Header(buf,0, ctx)
+    lenght := Header(buf, ctx)
 
     var statusCode = C.int(statuscode)
     var endTime = C.longlong(0)
@@ -521,7 +456,7 @@ func end_business_transaction(ctx context.Context,statuscode int) {
     _, err := aiRecObj.conn.Write(buf)
     fmt.Println("send data_end")
     if err != nil {
-        log.Fatal(err)
+        log.Println(err)
 
     }
 
@@ -529,8 +464,8 @@ func end_business_transaction(ctx context.Context,statuscode int) {
 
 
 func SendReqRespHeder(ctx context.Context,buffer string,Headertype string,statuscode int) {
-    var buf = make([]byte,0, 1024)
-    lenght := Header(buf, 0,ctx)
+    var buf = make([]byte, 1024)
+    lenght := Header(buf, ctx)
     
     var statusCode = C.int(statuscode)
     var buffer_len = C.int(len(buffer))
@@ -554,46 +489,7 @@ func SendReqRespHeder(ctx context.Context,buffer string,Headertype string,status
     _, err := aiRecObj.conn.Write(buf)
     fmt.Println("send headerReqResp")
     if err != nil {
-        log.Fatal(err)
+        log.Println(err)
 
      }
 }
-func NVCookieMessage(ctx context.Context) string {
-    var buf = make([]byte, 1024)
-    _ = Header(buf, 4, ctx)
-    _, err := aiRecObj.conn.Write(buf)
-    fmt.Println("NVCookieMessage send")
-    if err != nil {
-        log.Println("data not send",err)
-
-    }
-    nvValue := ReceiveMessageFromServer(0)
-    return nvValue
-
-}
-func NDCookieMessage(ctx context.Context) string {
-    var buf = make([]byte, 1024)
-    _ = Header(buf, 5, ctx)
-    _, err := aiRecObj.conn.Write(buf)
-    fmt.Println("NDCookieMessage send")
-    if err != nil {
-        log.Fatal(err)
-
-    }
-    ndValue := ReceiveMessageFromServer(1)
-    return ndValue
-}
-
-func NDNFCookieMessage(ctx context.Context) {
-    var buf = make([]byte, 1024)
-    _ = Header(buf, 6, ctx)
-    _, err := aiRecObj.conn.Write(buf)
-    fmt.Println("NDNFCookieMessage send")
-    if err != nil {
-        log.Fatal(err)
-
-    }
-    _ = ReceiveMessageFromServer(2)
-
-}
-
