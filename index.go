@@ -20,6 +20,7 @@ var (
 	CurrentContext context.Context
 )
 
+
 func WrapHandler(handler interface{}) interface{} {
 
 	
@@ -32,9 +33,8 @@ func WrapHandler(handler interface{}) interface{} {
 		
 		UDPConnection()
 		url_path := lambdacontext.FunctionName
-		nvValue := NVCookieMessage(ctx)
-   		ndValue := NDCookieMessage(ctx)
-		StartTransactionMessage(ctx ,url_path, "",ndValue,nvValue)
+
+		StartTransactionMessage(ctx ,url_path, "")
 		handlerType := reflect.TypeOf(handler)
 		if handlerType.NumIn() == 0 {
 			return reflect.ValueOf(nil), nil
@@ -44,9 +44,7 @@ func WrapHandler(handler interface{}) interface{} {
 		
 		
 		var methodName string
-		var eventvalue events.APIGatewayProxyRequest
-		var Headers string
-		
+		reqHeader := "" 
 		Sqs  	:= reflect.TypeOf(events.SQSEvent{})
 		Sns  	:= reflect.TypeOf(events.SNSEvent{}) 
 		S3  	:= reflect.TypeOf(events.S3Event{})
@@ -68,24 +66,23 @@ func WrapHandler(handler interface{}) interface{} {
 			case ApiReq :
 				
 				methodName = "index.ApiEndpointHandler"
-				Headers,eventvalue = ApiGatewayCall(msg)
-				log.Println("value in interface",eventvalue.RequestContext.RequestID)
+				reqHeader  = ApiGatewayCall(msg,reqHeader)
 			
 			default:
 				methodName = runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name()
+				log.Println("methodname costom",methodName)
 		
 			
 		}
 		statuscode := 200
 		method_entry(ctx,methodName)
-		if Headers != ""{
-			SendReqRespHeder(ctx ,Headers , "req" ,statuscode)
+		if reqHeader != ""{
+			SendReqRespHeder(ctx ,reqHeader , "req" ,statuscode)
 		}
 		CurrentContext = ctx
-		NDNFCookieMessage(ctx)
+		
 		result, err := callHandler(ctx,msg, handler,messageType)
 		if err != nil {
-			log.Println("Not able to get client data",err)
 			statuscode = 500
 		}
 	
@@ -93,7 +90,7 @@ func WrapHandler(handler interface{}) interface{} {
 		
 		end_business_transaction(ctx,statuscode)
 		
-		//CloseUDP()
+		CloseUDP()
 		coldStart = false
 		CurrentContext = nil
 		return result, err
@@ -129,9 +126,9 @@ func callHandler(ctx context.Context,msg json.RawMessage, handler interface{},me
 
 	handlerValue := reflect.ValueOf(handler)
 	
-	
+	log.Println("handlerValue   ",handlerValue)
 	output := handlerValue.Call(args)
-	
+	log.Println("full output",output)
 	var response interface{}
 	
 	var errResponse error
@@ -139,7 +136,7 @@ func callHandler(ctx context.Context,msg json.RawMessage, handler interface{},me
 	if len(output) > 0 {
 		// If there are any output values, the last should always be an error
 		val := output[len(output)-1].Interface()
-		
+		log.Println("val of output",val)
 		if errVal, ok := val.(error); ok {
 			errResponse = errVal
 		}
@@ -157,12 +154,11 @@ func callHandler(ctx context.Context,msg json.RawMessage, handler interface{},me
 				respHeader := ""
 				str, err := json.Marshal(response)
 				if err != nil {
-					
-					log.Println("unable to decode client data",err)
+					log.Println("unable to marshal json", err)
 				}
 				respHeader,statuscode := ApiResponseCall(str,respHeader)
 				
-				
+				log.Println("all header value 2",statuscode)
         			SendReqRespHeder(ctx ,respHeader , "resp" ,statuscode)
 		}
 		
@@ -178,4 +174,3 @@ func unmarshalEventForHandler(ev json.RawMessage, messageType reflect.Type) (ref
 	
 	return newMessage, err
 }
-
