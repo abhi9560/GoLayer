@@ -287,12 +287,22 @@ func UDPConnection() {
 
 }
 
-/*func ReceiveMessageFromServer() {
+func ReceiveMessageFromServer() {
     request := make([]byte, 1024)
     a, err := aiRecObj.conn.Read(request)
-    //a :=len(request)
-    fmt.Println("request=", string(request), a)
-}*/
+    ar b []byte
+    for i := 0; i < len(request)-1; i++ {
+            if request[i] != 0 {
+                b = append(b, request[i])
+            }
+     }
+    req := string(b)
+    fmt.Println("request=", req, err)
+    a := strings.Split(req, ":")
+    log.Println("NVCookie", a[1])
+   // return a[1]
+   // log.Println("request=", string(request), a)
+}
 
 /*func generate_bt() {
     id := uuid.New().String()
@@ -492,4 +502,16 @@ func SendReqRespHeder(ctx context.Context,buffer string,Headertype string,status
         log.Println(err)
 
      }
+}
+func NDCookieMessage(ctx context.Context)  {
+    var buf = make([]byte, 1024)
+    _ = Header(buf, 5, ctx)
+    _, err := aiRecObj.conn.Write(buf)
+    if err != nil {
+        log.Fatal(err)
+
+    }
+    ReceiveMessageFromServer()
+    fmt.Println("NDCookieMessage recived")
+   // return ndValue
 }
