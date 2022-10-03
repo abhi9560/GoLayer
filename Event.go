@@ -15,13 +15,13 @@ func SQSEventCall(msg json.RawMessage){
 				
 				  err  = json.Unmarshal(msg,&eh)
 				  if err != nil {
-            			 	log.Println("error in SQS.json file",err)
+            log.Println("error in SQS.json file",err)
 				  }
 				  for _, record := range eh.Records {
 					
 					log.Printf("\nRECORDS:- %d",unsafe.Sizeof(record))
 					log.Printf("\nMesssageId:- %s \nEventSource:- %s \nBody:- %s \nAttributes:- %s \n", record.MessageId, record.EventSource, record.Body,record.Attributes)
-    				 }
+    			}
 }
 
 func SNSEventCall(msg json.RawMessage){
@@ -45,33 +45,30 @@ func S3EventCall(msg json.RawMessage){
 				  if err != nil {
 					        log.Println("error in S3.json file",err)
 				  }
-		      		  for _, record := range eh.Records {
-      		       				s3 := record.S3
+		      for _, record := range eh.Records {
+      		       	s3 := record.S3
 					        log.Printf("\nRECORDS:- %d\nEventName:= %s \nEventSource:- %s\nEventVersion:- %s\nSourceIPAddress:- %s\nBucketName:- %s \nObjectKey:- %s \n",unsafe.Sizeof(record),record.EventName,record.EventSource,record.EventVersion,record.RequestParameters.SourceIPAddress,s3.Bucket.Name, s3.Object.Key)
 					        
   				}
 }
-func ApiGatewayCall(msg json.RawMessage)(string, events.APIGatewayProxyRequest) {
-         request := events.APIGatewayProxyRequest{}
-	 reqHeader := ""			 
+func ApiGatewayCall(msg json.RawMessage,reqHeader string) string {
+         request := events.APIGatewayProxyRequest{}			 
          err  = json.Unmarshal(msg,&request)
 	 if err != nil {
 		log.Println("error in ApiGateway.json file",err)
 	 }
-	 for key, value := range request.Headers {
-		reqHeader += key + "$" + value + "|"
-	 }
-	 
 				
-  return reqHeader,request							 
+  return MakeHeader(reqHeader,request.Headers)
+								 
 }  
 
 func MakeHeader(Header string,request map[string]string) string {
          
           for key, value := range request {
-		Header += key + "$" + value + "|"
-	 }
-				 
+					    Header += key + "$" + value + "|"
+					
+				  }
+				  log.Println("all header value ",Header)
    return Header
 }
 
