@@ -290,7 +290,7 @@ func UDPConnection() {
 func ReceiveMessageFromServer() {
     request := make([]byte, 1024)
     a, err := aiRecObj.conn.Read(request)
-    ar b []byte
+    var b []byte
     for i := 0; i < len(request)-1; i++ {
             if request[i] != 0 {
                 b = append(b, request[i])
