@@ -354,15 +354,15 @@ func ReceiveMessageFromServer(flag int) string {
     return i.String()
 }*/
 
-func StartTransactionMessage(ctx context.Context, bt_name string, CorrelationHeader string, ndValue string, nvValue string) {
+func StartTransactionMessage(ctx context.Context, bt_name string, CorrelationHeader string) {
 
     var buf = make([]byte, 1024)
     lenght := Header(buf, 0, ctx)
     var fp_header1 = "dummy_fp_header"
     var url1 = bt_name
     btHeaderValue1 := "dummy_btHeaderValue"
-    ndCookieSet1 := ndValue
-    nvCookieSet1 := nvValue
+    ndCookieSet1 := <- NdValue
+    nvCookieSet1 := <- NvValue
 
     var fp_header = C.int(len(fp_header1))
     var url = C.int(len(url1))
