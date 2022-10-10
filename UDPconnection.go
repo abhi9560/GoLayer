@@ -544,7 +544,7 @@ func SendReqRespHeder(ctx context.Context, buffer string, Headertype string, sta
     msg := "SendReqRespHeder completed"
     NDNFSendMessage(ctx, msg)
 }
-func NVCookieMessage(ctx context.Context) string {
+func NVCookieMessage(ctx context.Context)  {
     var buf = make([]byte, 1024)
     _ = Header(buf, 4, ctx)
     _, err := aiRecObj.conn.Write(buf)
@@ -556,9 +556,10 @@ func NVCookieMessage(ctx context.Context) string {
 
     msg := "NVookieMessage recived"
     NDNFSendMessage(ctx, msg)
-    return NVCookie
+    NvValue <- NVCookie 
+    
 }
-func NDCookieMessage(ctx context.Context) string {
+func NDCookieMessage(ctx context.Context) {
     var buf = make([]byte, 1024)
     _ = Header(buf, 5, ctx)
     _, err := aiRecObj.conn.Write(buf)
@@ -570,7 +571,8 @@ func NDCookieMessage(ctx context.Context) string {
     NDCookie := ReceiveMessageFromServer(1)
     msg := "NDCookieMessage recived"
     NDNFSendMessage(ctx, msg)
-    return NDCookie
+    NdValue <- NDCookie
+    
 }
 func NDCookieValue(ctx context.Context) string {
     var buf = make([]byte, 1024)
