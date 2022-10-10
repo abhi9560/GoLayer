@@ -68,13 +68,14 @@ func WrapHandler(handler interface{}) interface{} {
 			//log.Println("methodname costom", methodName)
 
 		}
-		NDCOOKIE_VALUE := NDCookieValue(ctx)
+		
 		statuscode := 200
 		method_entry(ctx, methodName)
 		if reqHeader != "" {
 			SendReqRespHeder(ctx, reqHeader, "req", statuscode)
 		}
 		if CkEnable == true && CkMethodPos == 1 {
+			NDCOOKIE_VALUE := NDCookieValue(ctx)
 			Ckheader = responsecookies(NDCOOKIE_VALUE)
 		}
 
@@ -87,6 +88,7 @@ func WrapHandler(handler interface{}) interface{} {
 
 		method_exit(ctx, methodName, statuscode)
 		if CkEnable == true && CkMethodPos > 1 {
+			NDCOOKIE_VALUE := NDCookieValue(ctx)
 			Ckheader = responsecookies(NDCOOKIE_VALUE)
 		}
 		end_business_transaction(ctx, statuscode)
