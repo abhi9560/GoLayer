@@ -11,7 +11,6 @@ int WrapHeader(char *s,int apiReqLen,int awsReqLen,int funcNameLen,int tagslengt
     wrapheader_t wrapHeader;
     memcpy(s, "^",1);
     len += 1;
-
     wrapHeader.wrapheadervar.apiReqLen = apiReqLen ;
     wrapHeader.wrapheadervar.awsReqLen = awsReqLen ;
     wrapHeader.wrapheadervar.funcNameLen = funcNameLen ;
@@ -35,7 +34,6 @@ int StartTransaction(char *s,int fp_header,int url,int btHeaderValue,int ndCooki
     msgHdr_t msgHdr;
     memcpy(s+len, "^",1);
     len += 1;
-
     node.transactionStartVar.qTimeMS = qTimeMS ;
     node.transactionStartVar.startTimeFP = startTimeFP;
     node.transactionStartVar.fp_header = fp_header ;
@@ -66,7 +64,6 @@ int MethodEntryFunction(char *s,int urlParameter,int methodName,int query_string
     MethodEntry_t node;
     memcpy(s+len, "^",1);
     len += 1;
-
     node.MethodEntryVar.methodName = methodName ;
     node.MethodEntryVar.threadId= threadId;
     node.MethodEntryVar.query_string = query_string ;
@@ -123,12 +120,10 @@ int EndTransaction(char *s,int statuscode,long long endTime,long long flowpathin
     msgHdr_t msgHdr;
     memcpy(s+len, "^",1);
     len += 1;
-
     transactionEnd.statuscode = statuscode ;
     transactionEnd.endTime = endTime ;
     transactionEnd.flowpathinstance = flowpathinstance;
     transactionEnd.cpuTime = cpuTime;
-
     msgHdr.header_len = sizeof(msgHdr_t);
     msgHdr.total_len = msgHdr.header_len + N + 3;
     msgHdr.msg_type = 3;
@@ -147,27 +142,21 @@ int ReqRespHeader(char *s,int statuscode,int buffer_len,int type_len,long long f
     node.transactionEncodeVarHttp.buffer_len = buffer_len;
     node.transactionEncodeVarHttp.type_len = type_len;
     node.transactionEncodeVarHttp.flowpathinstance = flowpathinstance;
-
     msgHdr_t msgHdr;
     memcpy(s+len, "^",1);
     len += 1;
-
     msgHdr.header_len = sizeof(msgHdr_t);
     msgHdr.total_len = msgHdr.header_len + sizeof(transactionEncodeVarHttp_t)  + node.transactionEncodeVarHttp.type_len +
     node.transactionEncodeVarHttp.buffer_len + 3;
     msgHdr.msg_type = 6;
-
     memcpy(s + len , (char *)&(msgHdr), sizeof(msgHdr_t));
     len += sizeof(msgHdr_t);
-
     memcpy(s + len , "|",1);
     len += 1;
-
      memcpy(s + len, (char *)&(node.transactionEncodeVarHttp), sizeof(node.transactionEncodeVarHttp));
     len += sizeof(transactionEncodeVarHttp_t);
     return len;
 }
-
 int last(char *s,int len)
 {
     memcpy(s + len, "\n", 1);
@@ -354,15 +343,15 @@ func ReceiveMessageFromServer(flag int) string {
     return i.String()
 }*/
 
-func StartTransactionMessage(ctx context.Context, bt_name string, CorrelationHeader string, ndValue string, nvValue string) {
+func StartTransactionMessage(ctx context.Context, bt_name string, CorrelationHeader string) {
 
     var buf = make([]byte, 1024)
     lenght := Header(buf, 0, ctx)
     var fp_header1 = "dummy_fp_header"
     var url1 = bt_name
     btHeaderValue1 := "dummy_btHeaderValue"
-    ndCookieSet1 := ndValue
-    nvCookieSet1 := nvValue
+    ndCookieSet1 := <- NdValue
+    nvCookieSet1 := <- NvValue
 
     var fp_header = C.int(len(fp_header1))
     var url = C.int(len(url1))
