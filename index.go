@@ -9,6 +9,7 @@ import (
 	"log"
 	"reflect"
 	"runtime"
+	"time"
 )
 
 var (
@@ -16,6 +17,8 @@ var (
 	CurrentContext context.Context
 )
 var Ckheader string
+var NvValue = make(chan string)
+var NdValue = make(chan string)
 
 func WrapHandler(handler interface{}) interface{} {
 
@@ -27,9 +30,10 @@ func WrapHandler(handler interface{}) interface{} {
 
 		UDPConnection()
 		url_path := lambdacontext.FunctionName
-		nvValue := NVCookieMessage(ctx)
-		ndValue := NDCookieMessage(ctx)
-		StartTransactionMessage(ctx, url_path, "", nvValue, ndValue)
+		go NVCookieMessage(ctx)
+		go NDCookieMessage(ctx)
+		time.Sleep(time.Millisecond * 200)
+		StartTransactionMessage(ctx, url_path, "", NvValue, NdValue)
 
 		handlerType := reflect.TypeOf(handler)
 		if handlerType.NumIn() == 0 {
