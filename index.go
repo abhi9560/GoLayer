@@ -17,8 +17,6 @@ var (
 	CurrentContext context.Context
 )
 var Ckheader string
-var NvValue = make(chan string)
-var NdValue = make(chan string)
 
 func WrapHandler(handler interface{}) interface{} {
 
@@ -27,13 +25,12 @@ func WrapHandler(handler interface{}) interface{} {
 	return func(ctx context.Context, msg json.RawMessage) (interface{}, error) {
 
 		ctx = context.WithValue(ctx, "cold_start", coldStart)
-
 		UDPConnection()
 		url_path := lambdacontext.FunctionName
+
 		go NVCookieMessage(ctx)
 		go NDCookieMessage(ctx)
 		time.Sleep(time.Millisecond * 200)
-		StartTransactionMessage(ctx, url_path, "")
 
 		handlerType := reflect.TypeOf(handler)
 		if handlerType.NumIn() == 0 {
@@ -72,17 +69,20 @@ func WrapHandler(handler interface{}) interface{} {
 			//log.Println("methodname costom", methodName)
 
 		}
-		NDCOOKIE_VALUE := NDCookieValue(ctx)
+		StartTransactionMessage(ctx, url_path, "")
 		statuscode := 200
+		if CkEnable == true {
+			go NDCookieValue(ctx)
+			time.Sleep(time.Millisecond * 200)
+		}
 		method_entry(ctx, methodName)
 		if reqHeader != "" {
 			SendReqRespHeder(ctx, reqHeader, "req", statuscode)
 		}
 		if CkEnable == true && CkMethodPos == 1 {
-			Ckheader = responsecookies(NDCOOKIE_VALUE)
-		}
 
-		CurrentContext = ctx
+			Ckheader = responsecookies()
+		}
 
 		result, err := callHandler(ctx, msg, handler, messageType)
 		if err != nil {
@@ -91,11 +91,11 @@ func WrapHandler(handler interface{}) interface{} {
 
 		method_exit(ctx, methodName, statuscode)
 		if CkEnable == true && CkMethodPos > 1 {
-			Ckheader = responsecookies(NDCOOKIE_VALUE)
+			Ckheader = responsecookies()
 		}
 		end_business_transaction(ctx, statuscode)
 
-		CloseUDP()
+		//CloseUDP()
 		coldStart = false
 		CurrentContext = nil
 		return result, err
@@ -129,9 +129,8 @@ func callHandler(ctx context.Context, msg json.RawMessage, handler interface{}, 
 
 	handlerValue := reflect.ValueOf(handler)
 
-	//log.Println("handlerValue   ", handlerValue)
 	output := handlerValue.Call(args)
-	//log.Println("full output", output)
+
 	var response interface{}
 
 	var errResponse error
@@ -160,7 +159,6 @@ func callHandler(ctx context.Context, msg json.RawMessage, handler interface{}, 
 			}
 			respHeader, responsevent := ApiResponseCall(str, respHeader, Ckheader)
 
-			//log.Println("all header value 2", statuscode)
 			SendReqRespHeder(ctx, respHeader, "resp", responsevent.StatusCode)
 			return responsevent, errResponse
 		}
