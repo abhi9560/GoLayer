@@ -188,21 +188,31 @@ import (
     "unsafe"
 )
 
+var NVCookie string
+var NDCookie string
+var NDCOOKIE_VALUE string
+
 func Header(buf []byte, msgType C.short, ctx context.Context) C.int {
 
     var funcName string
     var awsReqId string
+    var apiReqId string
     if lambdacontext.FunctionName != "" {
         funcName = lambdacontext.FunctionName
-        // log.Printf("FUNCTION NAME1: %s", lambdacontext.FunctionName)
+
     } else {
         funcName = "main_test1"
     }
-    var apiReqId = "c6af9ac6-7b61-11e6-9a41-93e8deadbeef"
+    if Apireqestid != "" {
+        apiReqId = Apireqestid
+    } else {
+        apiReqId = ""
+    }
+
     lc, _ := lambdacontext.FromContext(ctx)
     if lc.AwsRequestID != "" {
         awsReqId = lc.AwsRequestID
-        // log.Printf("REQUEST ID: %s", lc.AwsRequestID)
+
     } else {
         awsReqId = "asfddhgfjhgj"
     }
@@ -288,8 +298,6 @@ func UDPConnection() {
     //fmt.Println("udp_call")
 
     aiRecObj = NewAIRecord()
-    //fmt.Println(aiRecObj)
-
     time.Sleep(1 * time.Second)
 
 }
@@ -341,7 +349,7 @@ func ReceiveMessageFromServer(flag int) string {
     } else {
         req := string(b)
         c := strings.Split(req, ":")
-        // log.Println("value of NDCOOKIE=", c[1])
+        //log.Println("value of NDCOOKIE=", c[1])
         return c[1]
     }
 
@@ -361,8 +369,8 @@ func StartTransactionMessage(ctx context.Context, bt_name string, CorrelationHea
     var fp_header1 = "dummy_fp_header"
     var url1 = bt_name
     btHeaderValue1 := "dummy_btHeaderValue"
-    ndCookieSet1 := <- NdValue
-    nvCookieSet1 := <- NvValue
+    ndCookieSet1 := NDCookie
+    nvCookieSet1 := NVCookie
 
     var fp_header = C.int(len(fp_header1))
     var url = C.int(len(url1))
@@ -544,7 +552,7 @@ func SendReqRespHeder(ctx context.Context, buffer string, Headertype string, sta
     msg := "SendReqRespHeder completed"
     NDNFSendMessage(ctx, msg)
 }
-func NVCookieMessage(ctx context.Context)  {
+func NVCookieMessage(ctx context.Context) {
     var buf = make([]byte, 1024)
     _ = Header(buf, 4, ctx)
     _, err := aiRecObj.conn.Write(buf)
@@ -552,12 +560,11 @@ func NVCookieMessage(ctx context.Context)  {
         log.Println("Error in NVCookieMessage", err)
 
     }
-    NVCookie := ReceiveMessageFromServer(0)
+    NVCookie = ReceiveMessageFromServer(0)
 
     msg := "NVookieMessage recived"
     NDNFSendMessage(ctx, msg)
-    NvValue <- NVCookie 
-    
+
 }
 func NDCookieMessage(ctx context.Context) {
     var buf = make([]byte, 1024)
@@ -568,13 +575,12 @@ func NDCookieMessage(ctx context.Context) {
         log.Println("Error in NDCookieMessage ", err)
 
     }
-    NDCookie := ReceiveMessageFromServer(1)
+    NDCookie = ReceiveMessageFromServer(1)
     msg := "NDCookieMessage recived"
     NDNFSendMessage(ctx, msg)
-    NdValue <- NDCookie
-    
+
 }
-func NDCookieValue(ctx context.Context) string {
+func NDCookieValue(ctx context.Context) {
     var buf = make([]byte, 1024)
     _ = Header(buf, 6, ctx)
     _, err := aiRecObj.conn.Write(buf)
@@ -583,16 +589,15 @@ func NDCookieValue(ctx context.Context) string {
         log.Println("Error in NDNFCookieMessage ", err)
 
     }
-    NDCOOKIE_VALUE := ReceiveMessageFromServer(2)
+    NDCOOKIE_VALUE = ReceiveMessageFromServer(2)
     msg := "NDCookieValue recived"
     NDNFSendMessage(ctx, msg)
-    return NDCOOKIE_VALUE
 
 }
 
-func responsecookies(cookieval string) string {
-    Cookies := "Name=" + CkName + ";Value=" + cookieval + ";MaxAge=1000;Path=/;Domain=" + CkDomainName + ";Secure;HTTPOnly;"
-    // log.Println("cookies value", Cookies)
+func responsecookies() string {
+    Cookies := "Name=" + CkName + ";Value=" + NDCOOKIE_VALUE + ";MaxAge=1000;Path=/;Domain=" + CkDomainName + ";Secure;HTTPOnly;"
+    log.Println("cookies value", Cookies)
     return Cookies
 }
 
