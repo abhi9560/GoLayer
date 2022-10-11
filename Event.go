@@ -8,6 +8,7 @@ import (
 )
 
 var ApiResponse = events.APIGatewayProxyResponse{}
+var Apireqestid string
 
 func SQSEventCall(msg json.RawMessage) {
 
@@ -57,6 +58,7 @@ func ApiGatewayCall(msg json.RawMessage, reqHeader string) string {
 	if err != nil {
 		log.Println("error in ApiGateway.json file", err)
 	}
+	Apireqestid = request.RequestContext.RequestID
 
 	return MakeHeader(reqHeader, request.Headers)
 
@@ -68,7 +70,7 @@ func MakeHeader(Header string, request map[string]string) string {
 		Header += key + "$" + value + "|"
 
 	}
-	log.Println("all header value ", Header)
+
 	return Header
 }
 
