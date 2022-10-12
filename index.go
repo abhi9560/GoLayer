@@ -69,7 +69,7 @@ func WrapHandler(handler interface{}) interface{} {
 			//log.Println("methodname costom", methodName)
 
 		}
-		StartTransactionMessage(ctx, url_path, "",Correlation_header)
+		StartTransactionMessage(ctx, url_path, "",Bt_header)
 		statuscode := 200
 		if CkEnable == true {
 			go NDCookieValue(ctx)
