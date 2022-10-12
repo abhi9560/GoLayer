@@ -9,7 +9,7 @@ import (
 
 var ApiResponse = events.APIGatewayProxyResponse{}
 var Apireqestid string
-var Bt_header string
+var Bt_header = ""
 
 func SQSEventCall(msg json.RawMessage) {
 
