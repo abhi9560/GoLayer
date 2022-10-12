@@ -9,6 +9,7 @@ import (
 
 var ApiResponse = events.APIGatewayProxyResponse{}
 var Apireqestid string
+var Correlation_header string
 
 func SQSEventCall(msg json.RawMessage) {
 
@@ -68,7 +69,7 @@ func MakeHeader(Header string, request map[string]string) string {
 
 	for key, value := range request {
 		Header += key + "$" + value + "|"
-
+		Correlation_header += key + "=" + value + "&"
 	}
 
 	return Header
