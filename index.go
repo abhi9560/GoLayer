@@ -16,21 +16,25 @@ var (
 	// CurrentContext is the last create lambda context object.
 	CurrentContext context.Context
 )
-var Ckheader string
+var Closeroutine = true
+var Url_path string
 
 func WrapHandler(handler interface{}) interface{} {
 
 	coldStart := true
 
+	// Return custom handler, to be called once per invocation
 	return func(ctx context.Context, msg json.RawMessage) (interface{}, error) {
 
 		ctx = context.WithValue(ctx, "cold_start", coldStart)
-		UDPConnection()
-		url_path := lambdacontext.FunctionName
 
-		go NVCookieMessage(ctx)
-		go NDCookieMessage(ctx)
-		time.Sleep(time.Millisecond * 200)
+		UDPConnection()
+		go ReceiveMessageFromServer()
+		Url_path = lambdacontext.FunctionName
+		NVCookieMessage(ctx)
+
+		NDCookieMessage(ctx)
+		time.Sleep(time.Second * 1)
 
 		handlerType := reflect.TypeOf(handler)
 		if handlerType.NumIn() == 0 {
@@ -66,23 +70,25 @@ func WrapHandler(handler interface{}) interface{} {
 
 		default:
 			methodName = runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name()
-			//log.Println("methodname costom", methodName)
+			log.Println("methodname costom", methodName)
 
 		}
-		StartTransactionMessage(ctx, url_path, "",Bt_header)
 		statuscode := 200
 		if CkEnable == true {
-			go NDCookieValue(ctx)
-			time.Sleep(time.Millisecond * 200)
+			NDCookieValue(ctx)
+			time.Sleep(time.Second * 1)
+
 		}
+		StartTransactionMessage(ctx, "")
 		method_entry(ctx, methodName)
 		if reqHeader != "" {
 			SendReqRespHeder(ctx, reqHeader, "req", statuscode)
 		}
 		if CkEnable == true && CkMethodPos == 1 {
 
-			Ckheader = responsecookies()
+			responsecookies()
 		}
+		CurrentContext = ctx
 
 		result, err := callHandler(ctx, msg, handler, messageType)
 		if err != nil {
@@ -91,11 +97,12 @@ func WrapHandler(handler interface{}) interface{} {
 
 		method_exit(ctx, methodName, statuscode)
 		if CkEnable == true && CkMethodPos > 1 {
-			Ckheader = responsecookies()
+			responsecookies()
 		}
 		end_business_transaction(ctx, statuscode)
 
-		//CloseUDP()
+		CloseUDP()
+		Closeroutine = false
 		coldStart = false
 		CurrentContext = nil
 		return result, err
@@ -129,8 +136,9 @@ func callHandler(ctx context.Context, msg json.RawMessage, handler interface{}, 
 
 	handlerValue := reflect.ValueOf(handler)
 
+	//log.Println("handlerValue   ", handlerValue)
 	output := handlerValue.Call(args)
-
+	//log.Println("full output", output)
 	var response interface{}
 
 	var errResponse error
@@ -157,12 +165,11 @@ func callHandler(ctx context.Context, msg json.RawMessage, handler interface{}, 
 			if err != nil {
 				log.Println("unable to marshal json", err)
 			}
-			respHeader, responsevent := ApiResponseCall(str, respHeader, Ckheader)
+			respHeader, responsevent := ApiResponseCall(str, respHeader)
 
 			SendReqRespHeder(ctx, respHeader, "resp", responsevent.StatusCode)
 			return responsevent, errResponse
 		}
-
 	}
 
 	return response, errResponse
