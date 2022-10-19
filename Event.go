@@ -9,7 +9,6 @@ import (
 
 var ApiResponse = events.APIGatewayProxyResponse{}
 var Apireqestid string
-var Bt_header = ""
 
 func SQSEventCall(msg json.RawMessage) {
 
@@ -59,8 +58,8 @@ func ApiGatewayCall(msg json.RawMessage, reqHeader string) string {
 	if err != nil {
 		log.Println("error in ApiGateway.json file", err)
 	}
+	Url_path = request.Path
 	Apireqestid = request.RequestContext.RequestID
-
 	return MakeHeader(reqHeader, request.Headers)
 
 }
@@ -69,13 +68,13 @@ func MakeHeader(Header string, request map[string]string) string {
 
 	for key, value := range request {
 		Header += key + "$" + value + "|"
-		Bt_header += key + "=" + value + "&"
-	}
 
+	}
+	//log.Println("all header value ", Header)
 	return Header
 }
 
-func ApiResponseCall(msg []byte, respHeader string, Cookies string) (string, events.APIGatewayProxyResponse) {
+func ApiResponseCall(msg []byte, respHeader string) (string, events.APIGatewayProxyResponse) {
 
 	err = json.Unmarshal(msg, &ApiResponse)
 	if err != nil {
@@ -86,8 +85,9 @@ func ApiResponseCall(msg []byte, respHeader string, Cookies string) (string, eve
 	if len(ApiResponse.Headers) == 0 {
 		ApiResponse.Headers = map[string]string{"ResponseHeaders": "NotFound"}
 	}
-	ApiResponse.Headers = map[string]string{"set-cookie": Cookies}
-
+	if Ckheader != "" {
+		ApiResponse.Headers = map[string]string{"set-cookie": Ckheader}
+	}
 	respHeader = MakeHeader(respHeader, ApiResponse.Headers)
 	return respHeader, ApiResponse
 }
