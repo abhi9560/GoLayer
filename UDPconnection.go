@@ -382,11 +382,11 @@ func StartTransactionMessage(ctx context.Context, CorrelationHeader string) {
     lenght := Header(buf, 0, ctx)
     var fp_header1 = "dummy_fp_header"
 
-    btHeaderValue1 := "dummy_btHeaderValue"
+    //btHeaderValue1 := "dummy_btHeaderValue"
 
     var fp_header = C.int(len(fp_header1))
     var url = C.int(len(Url_path))
-    var btHeaderValue = C.int(len(btHeaderValue1))
+    var btHeaderValue = C.int(len(Bt_header))
     var ndCookieSet = C.int(len(Ndcookie))
     var nvCookieSet = C.int(len(Nvcookie))
     var correlationHeader = C.int(len(CorrelationHeader))
@@ -398,7 +398,7 @@ func StartTransactionMessage(ctx context.Context, CorrelationHeader string) {
 
     a := C.CString(fp_header1)
     b := C.CString(Url_path)
-    c := C.CString(btHeaderValue1)
+    c := C.CString(Bt_header)
     d := C.CString(Ndcookie)
     e := C.CString(Nvcookie)
     f := C.CString(CorrelationHeader)
