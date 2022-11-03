@@ -182,3 +182,4 @@ func unmarshalEventForHandler(ev json.RawMessage, messageType reflect.Type) (ref
 
 	return newMessage, err
 }
+
