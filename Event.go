@@ -10,8 +10,6 @@ import (
 var ApiResponse = events.APIGatewayProxyResponse{}
 var Apireqestid string
 
-//var Bt_header string
-
 func SQSEventCall(msg json.RawMessage) {
 
 	eh := events.SQSEvent{}
