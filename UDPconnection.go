@@ -276,21 +276,31 @@ func Header(buf []byte, msgType C.short, ctx context.Context) C.int {
     }
     len := C.WrapHeader((*C.char)(unsafe.Pointer(&buf[0])), apiReqLen, awsReqLen, funcNameLen, tagslength, agentType, messageType)
 
-    a := C.CString(apiReqId)
-    b := C.CString(awsReqId)
-    c := C.CString(funcName)
-    d := C.CString(tags)
-    defer C.free(unsafe.Pointer(a))
-    defer C.free(unsafe.Pointer(b))
-    defer C.free(unsafe.Pointer(c))
-    defer C.free(unsafe.Pointer(d))
+    /*a := C.CString(apiReqId)
+      b := C.CString(awsReqId)
+      c := C.CString(funcName)
+      d := C.CString(tags)
+      defer C.free(unsafe.Pointer(a))
+      defer C.free(unsafe.Pointer(b))
+      defer C.free(unsafe.Pointer(c))
+      defer C.free(unsafe.Pointer(d))
 
-    len = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), a, len, apiReqLen)
-    len = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), b, len, awsReqLen)
-    len = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), c, len, funcNameLen)
-    len = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), d, len, tagslength)
-
+      len = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), a, len, apiReqLen)
+      len = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), b, len, awsReqLen)
+      len = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), c, len, funcNameLen)
+      len = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), d, len, tagslength)
+    */
+    len = sendperameter(buf, len, apiReqId, awsReqId, funcName, tags)
     return len
+}
+
+func sendperameter(buf []byte, lenght C.int, nums ...string) C.int {
+    for _, num := range nums {
+        a := C.CString(num)
+        lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), a, lenght, C.int(len(num)))
+        C.free(unsafe.Pointer(a))
+    }
+    return lenght
 }
 
 type aiRecord struct {
@@ -319,7 +329,7 @@ func CloseUDP() {
 
 func UDPConnection() {
 
-    //log.Println("udp_call")
+    log.Println("udp_call")
 
     aiRecObj = NewAIRecord()
     // fmt.Println(aiRecObj)
@@ -341,6 +351,7 @@ var CkDomainName string
 var CkResHeader int = 0
 var CkMethodPos int = 0
 var Buffer []byte
+
 var Bt_header *string
 
 func ReceiveMessageFromServer() {
@@ -397,25 +408,26 @@ func StartTransactionMessage(ctx context.Context, CorrelationHeader string) {
 
     lenght = C.StartTransaction((*C.char)(unsafe.Pointer(&buf[0])), fp_header, url, btHeaderValue, ndCookieSet, nvCookieSet, correlationHeader, flowpathinstance, qTimeMS, startTimeFP, lenght)
 
-    a := C.CString(fp_header1)
-    b := C.CString(Url_path)
-    c := C.CString(btHeaderValue1)
-    d := C.CString(Ndcookie)
-    e := C.CString(Nvcookie)
-    f := C.CString(CorrelationHeader)
-    defer C.free(unsafe.Pointer(a))
-    defer C.free(unsafe.Pointer(b))
-    defer C.free(unsafe.Pointer(c))
-    defer C.free(unsafe.Pointer(d))
-    defer C.free(unsafe.Pointer(e))
-    defer C.free(unsafe.Pointer(f))
+    /*a := C.CString(fp_header1)
+      b := C.CString(Url_path)
+      c := C.CString(btHeaderValue1)
+      d := C.CString(Ndcookie)
+      e := C.CString(Nvcookie)
+      f := C.CString(CorrelationHeader)
+      defer C.free(unsafe.Pointer(a))
+      defer C.free(unsafe.Pointer(b))
+      defer C.free(unsafe.Pointer(c))
+      defer C.free(unsafe.Pointer(d))
+      defer C.free(unsafe.Pointer(e))
+      defer C.free(unsafe.Pointer(f))
 
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), a, lenght, fp_header)
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), b, lenght, url)
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), c, lenght, btHeaderValue)
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), d, lenght, ndCookieSet)
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), e, lenght, nvCookieSet)
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), f, lenght, correlationHeader)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), a, lenght, fp_header)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), b, lenght, url)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), c, lenght, btHeaderValue)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), d, lenght, ndCookieSet)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), e, lenght, nvCookieSet)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), f, lenght, correlationHeader)*/
+    lenght = sendperameter(buf, lenght, fp_header1, Url_path, btHeaderValue1, Ndcookie, Nvcookie, CorrelationHeader)
     C.last((*C.char)(unsafe.Pointer(&buf[0])), lenght)
     _, err := aiRecObj.conn.Write(buf)
 
@@ -446,16 +458,17 @@ func method_entry(ctx context.Context, MethodName string) {
 
     lenght = C.MethodEntryFunction((*C.char)(unsafe.Pointer(&buf[0])), urlParameter, methodName, query_string, mid, flowpathinstance, threadId, startTime, lenght)
 
-    a := C.CString(MethodName)
-    b := C.CString(query_string1)
-    c := C.CString(urlParameter1)
-    defer C.free(unsafe.Pointer(a))
-    defer C.free(unsafe.Pointer(b))
-    defer C.free(unsafe.Pointer(c))
+    /*a := C.CString(MethodName)
+      b := C.CString(query_string1)
+      c := C.CString(urlParameter1)
+      defer C.free(unsafe.Pointer(a))
+      defer C.free(unsafe.Pointer(b))
+      defer C.free(unsafe.Pointer(c))
 
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), a, lenght, methodName)
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), b, lenght, query_string)
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), c, lenght, urlParameter)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), a, lenght, methodName)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), b, lenght, query_string)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), c, lenght, urlParameter)*/
+    lenght = sendperameter(buf, lenght, MethodName, query_string1, urlParameter1)
 
     C.last((*C.char)(unsafe.Pointer(&buf[0])), lenght)
 
@@ -492,17 +505,18 @@ func method_exit(ctx context.Context, MethodName string, statuscode int) {
     var requestNotificationPhase = C.int(len(requestNotificationPhase1))
 
     lenght = C.MethodExitFunction((*C.char)(unsafe.Pointer(&buf[0])), statusCode, mid, eventType, isCallout, duration, threadId, cpuTime, flowpathinstance, tierCallOutSeqNum, endTime, methodName, backend_header, requestNotificationPhase, lenght)
-    a := C.CString(MethodName)
-    b := C.CString(backend_header1)
-    c := C.CString(requestNotificationPhase1)
+    /*a := C.CString(MethodName)
+      b := C.CString(backend_header1)
+      c := C.CString(requestNotificationPhase1)
 
-    defer C.free(unsafe.Pointer(a))
-    defer C.free(unsafe.Pointer(b))
-    defer C.free(unsafe.Pointer(c))
+      defer C.free(unsafe.Pointer(a))
+      defer C.free(unsafe.Pointer(b))
+      defer C.free(unsafe.Pointer(c))
 
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), a, lenght, methodName)
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), b, lenght, backend_header)
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), c, lenght, requestNotificationPhase)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), a, lenght, methodName)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), b, lenght, backend_header)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), c, lenght, requestNotificationPhase)*/
+    lenght = sendperameter(buf, lenght, MethodName, backend_header1, requestNotificationPhase1)
 
     C.last((*C.char)(unsafe.Pointer(&buf[0])), lenght)
     _, err := aiRecObj.conn.Write(buf)
@@ -549,14 +563,15 @@ func SendReqRespHeder(ctx context.Context, buffer string, Headertype string, sta
     var flowpathinstance = C.longlong(0)
 
     lenght = C.ReqRespHeader((*C.char)(unsafe.Pointer(&buf[0])), statusCode, buffer_len, type_len, flowpathinstance, lenght)
-    a := C.CString(buffer)
-    b := C.CString(Headertype)
+    /*a := C.CString(buffer)
+      b := C.CString(Headertype)
 
-    defer C.free(unsafe.Pointer(a))
-    defer C.free(unsafe.Pointer(b))
+      defer C.free(unsafe.Pointer(a))
+      defer C.free(unsafe.Pointer(b))
 
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), a, lenght, buffer_len)
-    lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), b, lenght, type_len)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), a, lenght, buffer_len)
+      lenght = C.ValueStore((*C.char)(unsafe.Pointer(&buf[0])), b, lenght, type_len)*/
+    lenght = sendperameter(buf, lenght, buffer, Headertype)
 
     C.last((*C.char)(unsafe.Pointer(&buf[0])), lenght)
     _, err := aiRecObj.conn.Write(buf)
