@@ -58,7 +58,7 @@ func ApiGatewayCall(msg json.RawMessage, reqHeader string) string {
 	if err != nil {
 		log.Println("error in ApiGateway.json file", err)
 	}
-	Url_path = request.Path
+	Url_path = request.Path + "|" + request.HTTPMethod
 	Apireqestid = request.RequestContext.RequestID
 	return MakeHeader(reqHeader, request.Headers)
 
