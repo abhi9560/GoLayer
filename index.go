@@ -34,7 +34,7 @@ func WrapHandler(handler interface{}) interface{} {
 		NVCookieMessage(ctx)
 
 		NDCookieMessage(ctx)
-		time.Sleep(time.Second * 1)
+		time.Sleep(time.Millisecond * 800)
 
 		handlerType := reflect.TypeOf(handler)
 		if handlerType.NumIn() == 0 {
@@ -182,5 +182,3 @@ func unmarshalEventForHandler(ev json.RawMessage, messageType reflect.Type) (ref
 
 	return newMessage, err
 }
-
-
