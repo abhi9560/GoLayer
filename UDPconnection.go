@@ -209,7 +209,7 @@ import "C"
 import (
     "context"
     "encoding/json"
-    "fmt"
+    //"fmt"
     "github.com/aws/aws-lambda-go/lambdacontext"
     "log"
     "net"
@@ -324,7 +324,7 @@ func NewAIRecord() *aiRecord {
 
 func CloseUDP() {
     aiRecObj.conn.Close()
-    fmt.Println("close")
+    // log.Println("close")
 }
 
 func UDPConnection() {
@@ -334,7 +334,7 @@ func UDPConnection() {
     aiRecObj = NewAIRecord()
     // fmt.Println(aiRecObj)
 
-    time.Sleep(1 * time.Second)
+    time.Sleep(800 * time.Millisecond)
 
 }
 
