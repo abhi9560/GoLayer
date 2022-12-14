@@ -134,6 +134,11 @@ typedef struct transactionEncodeVarHttp_t
     int  statuscode;
     int buffer_len;
     int type_len;
+    int OTL_version;
+    int OTL_traceflag;
+    int OTL_traceID;
+    int OTL_parentID;
+    int OTL_tracestate;
     long long flowpathinstance;
 
 }transactionEncodeVarHttp_t;
@@ -144,6 +149,9 @@ typedef struct transactionEncodeHttp_t
     struct transactionEncodeVarHttp_t transactionEncodeVarHttp;
     char* buffer;
     char* type;
+    char* OTL_traceID;
+    char* OTL_parentID;
+    char* OTL_tracestate;
 } transactionEncodeHttp_t;
 extern transactionEncodeHttp_t transactionEncodeHttp;
 
