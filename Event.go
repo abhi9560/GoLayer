@@ -67,8 +67,11 @@ func ApiGatewayCall(msg json.RawMessage, reqHeader string) string {
 func MakeHeader(Header string, request map[string]string) string {
 	var btheader string
 	Bt_header = nil
+	b := []rune{127}
 	for key, value := range request {
-		Header += key + "$" + value + "|"
+		Header += key + "$"
+		Header += value
+		Header += string(b)
 		btheader += key + "=" + value + "&"
 	}
 	//log.Println("all header value ", Header)
