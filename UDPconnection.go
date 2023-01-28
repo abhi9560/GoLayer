@@ -211,6 +211,8 @@ import (
     "encoding/json"
     //"fmt"
     "github.com/aws/aws-lambda-go/lambdacontext"
+    "github.com/aws/aws-sdk-go/aws/session"
+    "github.com/aws/aws-sdk-go/service/resourcegroupstaggingapi"
     "log"
     "net"
     "os"
@@ -263,7 +265,8 @@ func Header(buf []byte, msgType C.short, ctx context.Context) C.int {
     } else {
         appName = os.Getenv("CAV_APP_AGENT_INSTANCE")
     }
-    var tags = "tierName=" + Tier + ";ndAppServerHost=" + server + ";appName=" + appName
+    
+    var tags = "tierName=" + Tier + ";ndAppServerHost=" + server + ";appName=" + appName + ";tag=" + 
 
     var apiReqLen = C.int(len(apiReqId))
     var awsReqLen = C.int(len(awsReqId))
@@ -359,13 +362,13 @@ func ReceiveMessageFromServer() {
     for {
 
         request := make([]byte, 1024)
-        // time.Sleep(time.Millisecond * 200)
-        _, _ = aiRecObj.conn.Read(request)
+        
+        _, err := aiRecObj.conn.Read(request)
 
-        /*if err != nil {
+        if err != nil {
             log.Println("not able to recived data")
 
-        }*/
+        }
         for i := 0; i < len(request)-1; i++ {
             if request[i] != 0 {
                 Buffer = append(Buffer, request[i])
@@ -487,7 +490,7 @@ func method_exit(ctx context.Context, MethodName string, statuscode int) {
     var buf = make([]byte, 1024)
     lenght := Header(buf, 0, ctx)
 
-    backend_header1 := "NA|10.20.0.85|NA|NA|mydb|mysql|NA|NA|NA|root"
+    backend_header1 := "NA|10.20.0.85|NA|NA|Lambda|AWS|NA|NA|NA|root"
     requestNotificationPhase1 := ""
 
     var statusCode = C.int(statuscode)
