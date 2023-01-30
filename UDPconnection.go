@@ -266,7 +266,7 @@ func Header(buf []byte, msgType C.short, ctx context.Context) C.int {
         appName = os.Getenv("CAV_APP_AGENT_INSTANCE")
     }
     
-    var tags = "tierName=" + Tier + ";ndAppServerHost=" + server + ";appName=" + appName + ";tag=" + 
+    var tags = "tierName=" + Tier + ";ndAppServerHost=" + server + ";appName=" + appName + ";tags=CAVND=GoValue" 
 
     var apiReqLen = C.int(len(apiReqId))
     var awsReqLen = C.int(len(awsReqId))
