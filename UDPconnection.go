@@ -211,6 +211,7 @@ import (
     "encoding/json"
     //"fmt"
     "github.com/aws/aws-lambda-go/lambdacontext"
+    "github.com/aws/aws-sdk-go/aws"
     "github.com/aws/aws-sdk-go/aws/session"
     "github.com/aws/aws-sdk-go/service/resourcegroupstaggingapi"
     "log"
@@ -240,16 +241,16 @@ func Header(buf []byte, msgType C.short, ctx context.Context) C.int {
     if Apireqestid != "" {
         apiReqId = Apireqestid
     } else {
-        apiReqId = "afsgfd1435456"
+        apiReqId = "NotFound"
     }
     lc, _ := lambdacontext.FromContext(ctx)
     if lc.AwsRequestID != "" {
         awsReqId = lc.AwsRequestID
         //log.Printf("REQUEST ID: %s", lc.AwsRequestID)
     } else {
-        awsReqId = "asfddhgfjhgj"
+        awsReqId = "NotFound"
     }
-    var Tier, server, appName string
+    var Tier, server, appName, tagkey string
     if os.Getenv("CAV_APP_AGENT_TIER") == "" {
         Tier = "default"
     } else {
@@ -265,9 +266,45 @@ func Header(buf []byte, msgType C.short, ctx context.Context) C.int {
     } else {
         appName = os.Getenv("CAV_APP_AGENT_INSTANCE")
     }
-    
-    var tags = "tierName=" + Tier + ";ndAppServerHost=" + server + ";appName=" + appName + ";tags=CAVND=GoValue" 
+    var final []byte
+    if os.Getenv("CAV_APP_AGENT_TAGS") != "" {
+        tagkey = os.Getenv("CAV_APP_AGENT_TAGS")
+        tagfield := strings.Split(tagkey, ",")
+        //var myMap map[string]string
+        myMap := make(map[string]string)
+        //final = "Technolgy:go"
+        myMap["Technolgy"] = "go"
+        for _, i := range tagfield {
+            key := strings.Split(i, "=")
+            namespace := strings.Split(key[1], ":")
+            tagkeys := namespace[1]
+            fmt.Println(tagkeys)
+            var tagvalue string
+            switch namespace[0] {
+            case "aws":
+                tagvalue = findtagvalue(tagkeys, ctx)
+            case "inline":
+                tagvalue = tagkeys
+            case "env":
+                tagvalue = os.Getenv(tagkeys)
+            default:
+                log.Println("Unknow tag")
+            }
+            if key[0] != "" && tagvalue != "" {
+                myMap[key[0]] = tagvalue
+            }
 
+        }
+
+        final, err = json.Marshal(myMap)
+        if err != nil {
+            log.Printf("Error: %s", err.Error())
+        }
+
+    }
+
+    var tags = "tierName=" + Tier + ";ndAppServerHost=" + server + ";appName=" + appName + ";tags=" + string(final)
+    //fmt.Println(string(final))
     var apiReqLen = C.int(len(apiReqId))
     var awsReqLen = C.int(len(awsReqId))
     var funcNameLen = C.int(len(funcName))
@@ -295,6 +332,58 @@ func Header(buf []byte, msgType C.short, ctx context.Context) C.int {
     */
     len = sendperameter(buf, len, apiReqId, awsReqId, funcName, tags)
     return len
+}
+
+func findtagvalue(k string, ctx context.Context) string {
+
+    mySession := session.Must(session.NewSession())
+    r := resourcegroupstaggingapi.New(mySession, aws.NewConfig().WithRegion(os.Getenv("AWS_REGION")))
+    lc, _ := lambdacontext.FromContext(ctx)
+    var paginationToken string = ""
+    var in *resourcegroupstaggingapi.GetResourcesInput
+    var out *resourcegroupstaggingapi.GetResourcesOutput
+    var err error
+
+    if len(paginationToken) == 0 {
+        in = &resourcegroupstaggingapi.GetResourcesInput{
+            ResourcesPerPage: aws.Int64(50),
+        }
+        out, err = r.GetResources(in)
+        if err != nil {
+            log.Println("GetResources Output not found",err)
+        }
+    } else {
+        in = &resourcegroupstaggingapi.GetResourcesInput{
+            ResourcesPerPage: aws.Int64(50),
+            PaginationToken:  &paginationToken,
+        }
+    }
+    out, err = r.GetResources(in)
+    if err != nil {
+        log.Println("GetResources Output not found",err)
+    }
+    for _, resource := range out.ResourceTagMappingList {
+
+        if *resource.ResourceARN == lc.InvokedFunctionArn {
+            var myMap map[string]string
+            for _, a := range resource.Tags {
+
+                data, err := json.Marshal(a)
+                if err != nil {
+                    log.Println("error ", err)
+                }
+                json.Unmarshal(data, &myMap)
+            
+            if myMap["Key"] == k {
+                a := myMap["Value"]
+                return string(a)
+            }
+	  }
+        }else{
+		log.Println("ResourceARN function not found")
+	}
+    }
+    return ""
 }
 
 func sendperameter(buf []byte, lenght C.int, nums ...string) C.int {
@@ -362,13 +451,13 @@ func ReceiveMessageFromServer() {
     for {
 
         request := make([]byte, 1024)
-        
-        _, err := aiRecObj.conn.Read(request)
+        // time.Sleep(time.Millisecond * 200)
+        _, _ = aiRecObj.conn.Read(request)
 
-        if err != nil {
+        /*if err != nil {
             log.Println("not able to recived data")
 
-        }
+        }*/
         for i := 0; i < len(request)-1; i++ {
             if request[i] != 0 {
                 Buffer = append(Buffer, request[i])
