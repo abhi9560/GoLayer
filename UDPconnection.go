@@ -278,7 +278,7 @@ func Header(buf []byte, msgType C.short, ctx context.Context) C.int {
             key := strings.Split(i, "=")
             namespace := strings.Split(key[1], ":")
             tagkeys := namespace[1]
-            fmt.Println(tagkeys)
+            
             var tagvalue string
             switch namespace[0] {
             case "aws":
@@ -379,9 +379,7 @@ func findtagvalue(k string, ctx context.Context) string {
                 return string(a)
             }
 	  }
-        }else{
-		log.Println("ResourceARN function not found")
-	}
+        }
     }
     return ""
 }
