@@ -14,7 +14,7 @@ func SQSEventCall(msg json.RawMessage) {
 
 	eh := events.SQSEvent{}
 
-	err = json.Unmarshal(msg, &eh)
+	err := json.Unmarshal(msg, &eh)
 	if err != nil {
 		log.Println("error in SQS.json file", err)
 	}
@@ -28,7 +28,7 @@ func SQSEventCall(msg json.RawMessage) {
 func SNSEventCall(msg json.RawMessage) {
 	eh := events.SNSEvent{}
 
-	err = json.Unmarshal(msg, &eh)
+	err := json.Unmarshal(msg, &eh)
 	if err != nil {
 		log.Println("error in SNS.json file", err)
 	}
@@ -42,7 +42,7 @@ func SNSEventCall(msg json.RawMessage) {
 func S3EventCall(msg json.RawMessage) {
 	eh := events.S3Event{}
 
-	err = json.Unmarshal(msg, &eh)
+	err := json.Unmarshal(msg, &eh)
 	if err != nil {
 		log.Println("error in S3.json file", err)
 	}
@@ -54,7 +54,7 @@ func S3EventCall(msg json.RawMessage) {
 }
 func ApiGatewayCall(msg json.RawMessage, reqHeader string) string {
 	request := events.APIGatewayProxyRequest{}
-	err = json.Unmarshal(msg, &request)
+	err := json.Unmarshal(msg, &request)
 	if err != nil {
 		log.Println("error in ApiGateway.json file", err)
 	}
@@ -67,6 +67,7 @@ func ApiGatewayCall(msg json.RawMessage, reqHeader string) string {
 func MakeHeader(Header string, request map[string]string) string {
 	var btheader string
 	Bt_header = nil
+	//btheader = " "
 	b := []rune{127}
 	for key, value := range request {
 		Header += key + "$"
@@ -74,19 +75,17 @@ func MakeHeader(Header string, request map[string]string) string {
 		Header += string(b)
 		btheader += key + "=" + value + "&"
 	}
-	//log.Println("all header value ", Header)
 	Bt_header = &btheader
 	return Header
 }
 
 func ApiResponseCall(msg []byte, respHeader string) (string, events.APIGatewayProxyResponse) {
 
-	err = json.Unmarshal(msg, &ApiResponse)
+	err := json.Unmarshal(msg, &ApiResponse)
 	if err != nil {
 		log.Println("error in ApiGatewayResponse.json file", err)
 	}
 
-	//statuscode := ApiResponse.StatusCode
 	if len(ApiResponse.Headers) == 0 {
 		ApiResponse.Headers = map[string]string{"ResponseHeaders": "NotFound"}
 	}
