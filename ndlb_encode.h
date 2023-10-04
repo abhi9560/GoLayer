@@ -1,5 +1,10 @@
 #pragma pack(1)
 
+enum proxy_protocol_Type {
+  //PROTOCOL_TCP,
+  PROTOCOL_UDP,
+  PROTOCOL_TCP_UDP
+};
 
 typedef struct wrapheadervar_t {
 int whLen;
@@ -9,7 +14,9 @@ int funcNameLen;
 int tagslength;
 short agentType;
 short messageType;
-
+long long fpId;
+int appId;
+enum proxy_protocol_Type protocolType;
 }wrapheadervar_t;
 
 typedef struct wrapheader_t {
@@ -17,7 +24,7 @@ wrapheadervar_t wrapheadervar;
 char *apiReqId;
 char *awsReqId;
 char *funcName;
-char *tags;
+char *tags;//; separated key=value pairs
 }wrapheader_t;
 
 typedef struct msgHdr_t
@@ -38,7 +45,7 @@ typedef struct transactionStartVar_t
   int nvCookieSet;
   int correlationHeader;
   long long flowpathinstance;
-  long qTimeMS;
+  long long qTimeMS;
   long long startTimeFP;
 }transactionStartVar_t;
 
@@ -66,6 +73,7 @@ typedef struct transactionEnd_t
   long long flowpathinstance;
   long long endTime;
   long long cpuTime;
+  int tracerequest;
 }transactionEnd_t;
 
 extern transactionEnd_t transactionEnd;
@@ -75,12 +83,12 @@ typedef struct MethodEntryVar_t
   int mid;  
 
   long long flowpathinstance;
-  long threadId;
+  long long threadId;
   long long startTime;
-
   int methodName;
   int query_string;
   int urlParameter;
+  int query_parameter;
 }MethodEntryVar_t;
 
 extern MethodEntryVar_t MethodEntryVar;
@@ -92,10 +100,10 @@ typedef struct MethodEntry_t
   char *methodName;
   char *query_string;
   char *urlParameter;
+  char* query_parameter;
 }MethodEntry_t;
 
 extern MethodEntry_t MethodEntry;
-
 
 typedef struct MethodExitVar_t
 {
@@ -103,11 +111,10 @@ typedef struct MethodExitVar_t
   int mid;
   int eventType;
   int isCallout;
-  long threadId;
-  long duration;
+  long long threadId;
+  long long duration;
   long long flowpathinstance;
   long long cpuTime;
-
   int methodName;
   int backend_header;
   int requestNotificationPhase;
